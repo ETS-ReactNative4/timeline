@@ -1,42 +1,39 @@
 import React, { Component } from 'react';
-import Header from './Components/Layouts/Header'
+import Header from './components/layouts/Header';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import { AppBar, Toolbar, Typography } from '@material-ui/core';
 
 function autentica() {
-  fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/autenticar/${getCookie("BBSSOToken")}`, {
-    method: "GET",
-    headers: {
-      'Accept': 'application/json, text/plain, */*',
-      'Content-Type': 'application/json'
+  fetch(
+    `https://uce.intranet.bb.com.br/api-timeline/v1/autenticar/${getCookie(
+      'BBSSOToken'
+    )}`,
+    {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
     }
-  })
-    .then((response) => {
+  )
+    .then(response => {
       console.log(response);
 
-
       if (response.headers.get('x-access-token') != null) {
-
         window.sessionStorage.token = response.headers.get('x-access-token');
-
       }
-      return response.json()
-    }
+      return response.json();
+    })
 
-    )
-
-    .catch(function (err) {
-
+    .catch(function(err) {
       console.error(err);
-
     });
-
 }
 
-autentica()
+autentica();
 
 function getCookie(cname) {
-  var name = cname + "=";
+  var name = cname + '=';
   var decodedCookie = decodeURIComponent(document.cookie);
   var ca = decodedCookie.split(';');
   for (var i = 0; i < ca.length; i++) {
@@ -48,29 +45,23 @@ function getCookie(cname) {
       return c.substring(name.length, c.length);
     }
   }
-  return "";
+  return '';
 }
 
 class App extends Component {
   render() {
     return (
       <div>
-     
-      <Router initialEntries={['/timeline']} initialIndex={0}>
-     
-       
-        <div className="App">
-          <Route render={props => <Header {...props} />} />
-
-        </div>
-      
-      </Router>
-        </div>
- 
+        <Router initialEntries={['/timeline']} initialIndex={0}>
+          <div className="App">
+            <Route render={props => <Header {...props} />} />
+          </div>
+        </Router>
+      </div>
     );
   }
 }
 const titulo = {
-  fontSize: 18 
-}
+  fontSize: 18
+};
 export default App;

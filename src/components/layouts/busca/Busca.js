@@ -119,16 +119,11 @@ class Busca extends React.Component {
     };
 
     this.triggerChange = this.triggerChange.bind(this);
-
-    
   } 
 
   componentWillMount() {
     this.timer = null;
   }
-
-
- 
 
   handleSuggestionsFetchRequested = ({ value }) => {
     this.setState({
