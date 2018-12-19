@@ -3,10 +3,9 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
-
 import { Typography, Paper } from '@material-ui/core';
-import Fab from '@material-ui/core/Fab';
-import AddIcon from '@material-ui/icons/Add';
+import Divider from '@material-ui/core/Divider';
+
 const styles = theme => ({});
 
 class ToDo extends React.Component {
@@ -29,15 +28,14 @@ class ToDo extends React.Component {
         >
           <Grid item lg={6}>
             <Paper>
-              <Typography variant="h5">Pendencias BB</Typography>
-              <Fab color="primary" aria-label="Add" className={classes.fab}>
-                <AddIcon />
-              </Fab>
+              <Typography variant="h5">Pendências BB</Typography>
+              <Divider />
             </Paper>
           </Grid>
           <Grid item lg={6}>
             <Paper>
-              <Typography variant="h5">Pendencias Empresa</Typography>
+              <Typography variant="h5">Pendências Empresa</Typography>
+              <Divider />
             </Paper>
           </Grid>
         </Grid>
