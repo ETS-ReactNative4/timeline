@@ -45,7 +45,19 @@ function getSorting(order, orderBy) {
     : (a, b) => -desc(a, b, orderBy);
 }
 
-const rows = [];
+const rows = [
+  { id: 'nome', numeric: false, disablePadding: true, label: 'Nome' },
+  {
+    id: 'evolvimento',
+    numeric: false,
+    disablePadding: true,
+    label: 'Evolvimento'
+  },
+
+  { id: 'empresa', numeric: false, disablePadding: true, label: 'Empresa' },
+  { id: 'telefone', numeric: false, disablePadding: true, label: 'Telefone' },
+  { id: 'email', numeric: false, disablePadding: true, label: 'Email' }
+];
 
 class EnhancedTableHead extends React.Component {
   createSortHandler = property => event => {
@@ -303,8 +315,11 @@ class EnhancedTable extends React.Component {
                       <TableCell component="th" scope="row" padding="none">
                         {n.nome}
                       </TableCell>
-                      <TableCell numeric>{n.prefixo}</TableCell>
                       <TableCell numeric>{n.envolvimento}</TableCell>
+
+                      <TableCell numeric>{n.empresa}</TableCell>
+                      <TableCell numeric>{n.telefone}</TableCell>
+                      <TableCell numeric>{n.email}</TableCell>
                     </TableRow>
                   );
                 })}

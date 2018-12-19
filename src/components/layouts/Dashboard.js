@@ -8,7 +8,7 @@ const styles = theme => ({
   root: {
     flexGrow: 1
   },
-  container: { margin: 'auto' },
+
   cardCategory: {
     color: '#999999',
     margin: '0',
@@ -35,6 +35,8 @@ class Dashboard extends React.Component {
   }
 
   componentWillMount() {
+    console.log('passou aqui');
+
     this.getDashboardData(this.props.empresa);
   }
 
@@ -57,11 +59,10 @@ class Dashboard extends React.Component {
   render() {
     const { dados } = this.state;
     const { classes, empresa } = this.props;
-    console.log(dados);
+
     return (
       <div className={classes.root}>
         <Grid
-          className={classes.container}
           container
           item
           direction="row"
@@ -70,7 +71,7 @@ class Dashboard extends React.Component {
           spacing={24}
           sm={12}
           md={12}
-          lg={8}
+          lg={12}
         >
           <Grid item xs={12} md={12} lg={12}>
             <Typography variant="h5">{empresa.nome}</Typography>

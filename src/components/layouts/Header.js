@@ -11,6 +11,7 @@ import FormControl from '@material-ui/core/FormControl';
 import logo from '../../bancodobrasil.png';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CardGrid from './CardGrid';
+
 //https://uce.intranet.bb.com.br/timeline/?visao=1&bloco_origem=4&cnpj=05.721.752/0001-65&cod_pais=23&mci=509277368&nm_prefixo_redex=FRANKFURT%20ALEMANHA&nome=ADIDAS%20AG&pais=ALEMANHA&prefixo_redex=720&tabela_origem=2
 
 const theme = createMuiTheme({
@@ -55,10 +56,6 @@ function createEmpresa(
     bloco_origem,
     envolvimento
   };
-}
-
-function TabContainer(props) {
-  return <React.Fragment>{props.children}</React.Fragment>;
 }
 
 class Header extends React.Component {
@@ -339,7 +336,7 @@ class Header extends React.Component {
     };
 
     return (
-      <div>
+      <div className={classes.root}>
         <MuiThemeProvider theme={theme}>
           <AppBar position="static" color="primary">
             <Toolbar>
@@ -354,21 +351,20 @@ class Header extends React.Component {
               </FormControl>
             </Toolbar>
           </AppBar>
-          <div className={classes.rootTabs}>
-            <Route
-              path="/timeline"
-              render={props => (
-                <CardGrid
-                  empresa={empresa}
-                  eventos={eventos}
-                  getEventos={this.getEventos}
-                  myCallbackOpenDialog={this.myCallbackOpenDialog}
-                  setEvento={this.setEvento}
-                  {...props}
-                />
-              )}
-            />
-          </div>
+
+          <Route
+            path="/timeline"
+            render={props => (
+              <CardGrid
+                empresa={empresa}
+                eventos={eventos}
+                getEventos={this.getEventos}
+                myCallbackOpenDialog={this.myCallbackOpenDialog}
+                setEvento={this.setEvento}
+                {...props}
+              />
+            )}
+          />
 
           <FormEvent
             open={this.state.open}
@@ -398,28 +394,11 @@ function salvarUltimaPesaquisaCache(visao, objeto) {
 }
 
 const styles = theme => ({
-  rootTabs: {
-    backgroundColor: theme.palette.background.paper
-  },
-  textField: {
-    margin: theme.spacing.unit
-  },
-
-  cssUnderline: {
-    '&:after': {
-      borderBottomColor: 'white'
-    }
-  },
   subBar: {
     backgroundColor: '#0d47a1'
   },
-
-  formControl: {
-    width: 200,
-    margin: theme.spacing.unit
-  },
-  dadosEmpresa: {
-    padding: theme.spacing.unit
+  root: {
+    width: '100%'
   }
 });
 

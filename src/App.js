@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import Header from './components/layouts/Header';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import { AppBar, Toolbar, Typography } from '@material-ui/core';
 
 function autentica() {
   fetch(
@@ -17,7 +16,7 @@ function autentica() {
     }
   )
     .then(response => {
-      console.log(response);
+      console.log(response.status);
 
       if (response.headers.get('x-access-token') != null) {
         window.sessionStorage.token = response.headers.get('x-access-token');
@@ -51,17 +50,13 @@ function getCookie(cname) {
 class App extends Component {
   render() {
     return (
-      <div>
-        <Router initialEntries={['/timeline']} initialIndex={0}>
-          <div className="App">
-            <Route render={props => <Header {...props} />} />
-          </div>
-        </Router>
-      </div>
+      <Router initialEntries={['/timeline']} initialIndex={0}>
+        <div className="App">
+          <Route render={props => <Header {...props} />} />
+        </div>
+      </Router>
     );
   }
 }
-const titulo = {
-  fontSize: 18
-};
+
 export default App;

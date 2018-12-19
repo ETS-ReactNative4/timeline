@@ -7,6 +7,7 @@ import EventCard from './EventCard';
 import { Typography, Card, CardHeader } from '@material-ui/core';
 import red from '@material-ui/core/colors/red';
 import Dashboard from './Dashboard';
+import ToDo from './ToDo';
 
 const styles = theme => ({
   cardVazio: {
@@ -16,7 +17,7 @@ const styles = theme => ({
     margin: theme.spacing.unit * 2
   },
   container: {
-    margin: 'auto'
+    /*  margin: 'auto'*/
   }
 });
 
@@ -34,6 +35,7 @@ class CardGrid extends React.Component {
     return (
       <div>
         <Dashboard empresa={empresa} />
+        <ToDo />
         <Grid
           className={classNames(classes.container)}
           container
@@ -44,7 +46,7 @@ class CardGrid extends React.Component {
           spacing={16}
           sm={12}
           md={12}
-          lg={8}
+          lg={12}
         >
           {eventos.timeline ? (
             eventos.timeline.map((evento, index) => (
@@ -60,7 +62,7 @@ class CardGrid extends React.Component {
           ) : (
             <Card className={classes.cardVazio}>
               <Typography variant="h5" className={classes.cardVazio}>
-                Não há eventos para este cliente
+                Tem sim eventos para este cliente
               </Typography>
             </Card>
           )}

@@ -21,9 +21,10 @@ import TableFunci from './buscafunci/TableFunci';
 import TableEmpresa from './buscaEmpresa/TableEmpresa';
 import BuscaDependencia from './buscaDependencia/BuscaDependencia';
 import TableDependencia from './buscaDependencia/TableDependencia';
+import TableParticipante from './TableParticipantes';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from 'material-ui-pickers';
-import TableParticipantes from './TableParticipantes';
+
 // pick utils
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -32,7 +33,7 @@ import MomentUtils from '@date-io/moment';
 
 import { TimePicker } from 'material-ui-pickers';
 import { DatePicker } from 'material-ui-pickers';
-import { Card, CardContent, Grid, CardActions } from '@material-ui/core';
+import { Card, CardContent, Grid, Fab } from '@material-ui/core';
 import Divider from '@material-ui/core/Divider';
 
 moment.locale('pt-br');
@@ -104,14 +105,17 @@ class FormEvent extends React.Component {
 
     this.state = {
       currentLocale: 'pt-br',
-      contatoParticipanteEmpresa: '',
-      envolvimentoParticipanteEmpresa: '',
-      participanteEmpresa: '',
-      participantesEmpresa: []
+      telefone: '',
+      email: '',
+      envolvimento: '',
+      nome: '',
+      participantesEmpresa: [],
+      errors: {}
     };
 
     this.enviaForm = this.enviaForm.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
+    this.addParticipante = this.addParticipante.bind(this);
   }
 
   handleClickOpen = () => {
@@ -130,11 +134,64 @@ class FormEvent extends React.Component {
   handleChange = input => e => {
     this.props.handleChange(input, e);
   };
-  addParticipante = event => {
-    event.preventDefault();
 
-    console.log(event);
+  handleChangeForm = input => e => {
+    this.setState({ [input]: e.target.value });
   };
+
+  handleValidation() {
+    const { nome, telefone, email, envolvimento } = this.state;
+    let errors = {};
+    let formIsValid = true;
+    console.log(nome, telefone, email, envolvimento);
+
+    if (!nome || nome == '') {
+      formIsValid = false;
+      errors['nome'] = 'Não pode estar vazio';
+    }
+
+    if (!telefone || telefone == '') {
+      formIsValid = false;
+      errors['telefone'] = 'Não pode estar vazio';
+    }
+
+    if (!email || email == '') {
+      formIsValid = false;
+      errors['email'] = 'Não pode estar vazio';
+    }
+
+    if (!envolvimento || envolvimento == '') {
+      formIsValid = false;
+      errors['envolvimento'] = 'Não pode estar vazio';
+    }
+
+    this.setState({ errors: errors });
+    return formIsValid;
+  }
+
+  addParticipante = event => {
+    const { nome, telefone, email, envolvimento } = this.state;
+    event.preventDefault();
+    if (this.handleValidation()) {
+      this.setState({
+        participantesEmpresa: [
+          ...this.state.participantesEmpresa,
+          {
+            nome: nome,
+            telefone: telefone,
+            email: email,
+            envolvimento: envolvimento
+          }
+        ]
+      });
+
+      this.setState({ nome: '' });
+      this.setState({ telefone: '' });
+      this.setState({ email: '' });
+      this.setState({ envolvimento: '' });
+    }
+  };
+
   enviaForm(event) {
     event.preventDefault();
     let { evento, empresa } = this.props;
@@ -177,28 +234,30 @@ class FormEvent extends React.Component {
     } = this.props;
 
     const {
-      contatoParticipanteEmpresa,
-      envolvimentoParticipanteEmpresa,
-      participanteEmpresa
+      nome,
+      telefone,
+      email,
+      envolvimento,
+      participantesEmpresa
     } = this.state;
-    const participantesEmpresa = {
-      contatoParticipanteEmpresa,
-      envolvimentoParticipanteEmpresa,
-      participanteEmpresa
+    const participanteEmpresa = {
+      nome,
+      telefone,
+      email,
+      envolvimento
     };
 
     return (
       <div>
         <MuiThemeProvider theme={theme}>
-          <Button
-            variant="fab"
-            mini
+          <Fab
+            size="small"
             className={classes.fab}
             color="primary"
             onClick={this.handleClickOpen}
           >
             <AddIcon />
-          </Button>
+          </Fab>
 
           <Dialog
             fullScreen
@@ -430,36 +489,52 @@ class FormEvent extends React.Component {
                       <Divider />
 
                       <TextField
-                        id="standard-envolvimentoParticipanteEmpresa"
+                        id="standard-envolvimento"
                         label="Envolvimento"
                         fullWidth
+                        error={
+                          !this.state.errors['envolvimento'] ? false : true
+                        }
+                        helperText={this.state.errors['envolvimento']}
                         className={classes.textField}
-                        value={this.state.envolvimentoParticipanteEmpresa}
-                        onChange={this.handleChange(
-                          'envolvimentoParticipanteEmpresa'
-                        )}
+                        value={envolvimento}
+                        onChange={this.handleChangeForm('envolvimento')}
                         margin="normal"
                       />
 
                       <TextField
-                        id="standard-participantesEmpresa"
+                        id="standard-nome"
                         label="Nome"
                         fullWidth
+                        error={!this.state.errors['nome'] ? false : true}
+                        helperText={this.state.errors['nome']}
                         className={classes.textField}
-                        value={this.state.participanteEmpresa}
-                        onChange={this.handleChange('participantesEmpresa')}
+                        value={nome}
+                        onChange={this.handleChangeForm('nome')}
                         margin="normal"
                       />
 
                       <TextField
-                        id="standard-envolvimentoParticipantesEmpresa"
-                        label="Contato"
+                        id="standard-telefone"
+                        label="Telefone"
+                        fullWidth
+                        error={!this.state.errors['telefone'] ? false : true}
+                        helperText={this.state.errors['telefone']}
+                        className={classes.textField}
+                        value={telefone}
+                        onChange={this.handleChangeForm('telefone')}
+                        margin="normal"
+                      />
+
+                      <TextField
+                        id="standard-email"
+                        label="Email"
+                        error={!this.state.errors['email'] ? false : true}
+                        helperText={this.state.errors['email']}
                         fullWidth
                         className={classes.textField}
-                        value={this.state.contatoParticipanteEmpresa}
-                        onChange={this.handleChange(
-                          'contatoParticipanteEmpresa'
-                        )}
+                        value={email}
+                        onChange={this.handleChangeForm('email')}
                         margin="normal"
                       />
                       <Button
@@ -469,6 +544,7 @@ class FormEvent extends React.Component {
                       >
                         Adicionar participante
                       </Button>
+                      <TableParticipante data={participantesEmpresa} />
 
                       <div className={classes.buttons}>
                         <Button
