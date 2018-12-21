@@ -29,13 +29,14 @@ class CardGrid extends React.Component {
       myCallbackOpenDialog,
       setEvento,
       setEventos,
-      empresa
+      empresa,
+      tarefas
     } = this.props;
 
     return (
       <div>
         <Dashboard empresa={empresa} />
-        <ToDo empresa={empresa} eventos={eventos} />
+        <ToDo empresa={empresa} tarefas={tarefas} />
         <Grid
           className={classNames(classes.container)}
           container
@@ -48,8 +49,8 @@ class CardGrid extends React.Component {
           md={12}
           lg={12}
         >
-          {eventos.timeline ? (
-            eventos.timeline.map((evento, index) => (
+          {eventos.length > 0 ? (
+            eventos.map((evento, index) => (
               <EventCard
                 empresa={empresa}
                 evento={evento}

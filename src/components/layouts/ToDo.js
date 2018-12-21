@@ -78,6 +78,7 @@ class ToDo extends React.Component {
 
   addItem = e => {
     e.preventDefault();
+
     if (this.state.tarefa == '') {
       return;
     }
@@ -101,7 +102,8 @@ class ToDo extends React.Component {
 
   enviaEvento(tarefa) {
     let { empresa } = this.props;
-
+    empresa.envolvimentoEmpresa = 1;
+    tarefa.empresas = [empresa];
     const data = { evento: tarefa };
 
     fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
@@ -122,9 +124,9 @@ class ToDo extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { eventos } = this.props;
-    console.log(eventos);
-    const { tarefa, tarefas, checked, checkedB } = this.state;
+    const { tarefas } = this.props;
+    console.log(tarefas);
+    const { tarefa, checked, checkedB } = this.state;
 
     return (
       <div>

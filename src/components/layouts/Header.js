@@ -87,7 +87,8 @@ class Header extends React.Component {
       tipoEvento: 1,
       status: 1,
       comentario: '',
-      id: undefined
+      id: undefined,
+      tarefas: []
     };
   }
 
@@ -298,7 +299,27 @@ class Header extends React.Component {
       }
     })
       .then(response => response.json())
-      .then(data => this.setState({ eventos: data }))
+      .then(data => {
+        const eventosFiltrado = data.timeline
+          ? data.timeline.filter(el => {
+              if (![5, 6].includes(el.tipo_envolvimento_id)) {
+                return el;
+              }
+            })
+          : [];
+
+        const tarefasFiltradas = data.timeline
+          ? data.timeline.filter(el => {
+              if ([5, 6].includes(el.tipo_envolvimento_id)) {
+                return el;
+              }
+            })
+          : [];
+        this.setState({ eventos: eventosFiltrado });
+
+        this.setState({ tarefas: tarefasFiltradas });
+      })
+
       .catch(function(err) {
         console.error(err);
       });
@@ -306,7 +327,7 @@ class Header extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { value, url, eventos, currentLocale } = this.state;
+    const { value, url, eventos, currentLocale, tarefas } = this.state;
     const {
       descricao,
       tipoEvento,
@@ -358,6 +379,7 @@ class Header extends React.Component {
               <CardGrid
                 empresa={empresa}
                 eventos={eventos}
+                tarefas={tarefas}
                 getEventos={this.getEventos}
                 myCallbackOpenDialog={this.myCallbackOpenDialog}
                 setEvento={this.setEvento}
