@@ -93,7 +93,6 @@ class ToDo extends React.Component {
     let tarefa = {
       descricao: this.state.tarefa,
       id: Date.now(),
-      concluida: false,
       dt_evento: new Date(),
       tipoEvento: 5,
       status: 3
@@ -124,7 +123,7 @@ class ToDo extends React.Component {
       }
     })
       .then(response => response.json())
-
+      .then(this.props.getEventos(empresa))
       .catch(function(err) {
         console.error(err);
       });

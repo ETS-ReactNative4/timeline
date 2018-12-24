@@ -17,6 +17,10 @@ function autentica() {
   )
     .then(response => {
       console.log(response.status);
+      if (response.status > 300) {
+        window.location =
+          'https://login.intranet.bb.com.br/distAuth/UI/Login?goto=https://uce.intranet.bb.com.br/timeline/';
+      }
 
       if (response.headers.get('x-access-token') != null) {
         window.sessionStorage.token = response.headers.get('x-access-token');
@@ -28,8 +32,6 @@ function autentica() {
       console.error(err);
     });
 }
-
-autentica();
 
 function getCookie(cname) {
   var name = cname + '=';
@@ -48,6 +50,11 @@ function getCookie(cname) {
 }
 
 class App extends Component {
+  constructor(props) {
+    super(props);
+    autentica();
+  }
+
   render() {
     return (
       <Router initialEntries={['/timeline']} initialIndex={0}>

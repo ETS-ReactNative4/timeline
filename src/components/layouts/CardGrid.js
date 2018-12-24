@@ -23,6 +23,8 @@ const styles = theme => ({
 
 class CardGrid extends React.Component {
   render() {
+    console.log(this.props);
+
     const {
       classes,
       eventos,
@@ -31,13 +33,18 @@ class CardGrid extends React.Component {
       setEventos,
       empresa,
       tarefas,
-      dados
+      dados,
+      getEventos
     } = this.props;
 
     return (
       <div>
         <Dashboard empresa={empresa} dados={dados} />
-        <ToDo empresa={empresa} tarefas={tarefas} />
+        <ToDo
+          empresa={empresa}
+          tarefas={tarefas}
+          getEventos={this.props.getEventos}
+        />
         <Grid
           className={classNames(classes.container)}
           container
