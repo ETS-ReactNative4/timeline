@@ -30,12 +30,13 @@ class CardGrid extends React.Component {
       setEvento,
       setEventos,
       empresa,
-      tarefas
+      tarefas,
+      dados
     } = this.props;
 
     return (
       <div>
-        <Dashboard empresa={empresa} />
+        <Dashboard empresa={empresa} dados={dados} />
         <ToDo empresa={empresa} tarefas={tarefas} />
         <Grid
           className={classNames(classes.container)}

@@ -28,37 +28,12 @@ const styles = theme => ({
 class Dashboard extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      dados: {}
-    };
-    this.getDashboardData = this.getDashboardData.bind();
   }
 
-  componentWillMount() {
-    console.log('passou aqui');
+  componentWillMount() {}
 
-    this.getDashboardData(this.props.empresa);
-  }
-
-  getDashboardData = empresa => {
-    fetch('https://uce.intranet.bb.com.br/api-timeline/v1/eventos/dashboard', {
-      method: 'POST',
-      body: JSON.stringify({ empresa: empresa }),
-      headers: {
-        'x-access-token': window.sessionStorage.token,
-        Accept: 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => response.json())
-      .then(data => this.setState({ dados: data.dados[0] }))
-      .catch(function(err) {
-        console.error(err);
-      });
-  };
   render() {
-    const { dados } = this.state;
-    const { classes, empresa } = this.props;
+    const { classes, empresa, dados } = this.props;
 
     return (
       <div className={classes.root}>

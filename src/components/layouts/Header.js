@@ -88,7 +88,8 @@ class Header extends React.Component {
       status: 1,
       comentario: '',
       id: undefined,
-      tarefas: []
+      tarefas: [],
+      dados: {}
     };
   }
 
@@ -234,6 +235,24 @@ class Header extends React.Component {
     }
   };
 
+  getDashboardData = empresa => {
+    console.log(empresa);
+
+    fetch('https://uce.intranet.bb.com.br/api-timeline/v1/eventos/dashboard', {
+      method: 'POST',
+      body: JSON.stringify({ empresa: empresa }),
+      headers: {
+        'x-access-token': window.sessionStorage.token,
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => this.setState({ dados: data.dados[0] }))
+      .catch(function(err) {
+        console.error(err);
+      });
+  };
   myCallbackDependencia = dependenciaChild => {
     this.setState({
       dependencias: [
@@ -319,6 +338,7 @@ class Header extends React.Component {
 
         this.setState({ tarefas: tarefasFiltradas });
       })
+      .then(this.getDashboardData(empresa))
 
       .catch(function(err) {
         console.error(err);
@@ -340,7 +360,8 @@ class Header extends React.Component {
       envolvimentoDependencia,
       empresa,
       funcionarios,
-      id
+      id,
+      dados
     } = this.state;
     const evento = {
       descricao,
@@ -380,6 +401,7 @@ class Header extends React.Component {
                 empresa={empresa}
                 eventos={eventos}
                 tarefas={tarefas}
+                dados={dados}
                 getEventos={this.getEventos}
                 myCallbackOpenDialog={this.myCallbackOpenDialog}
                 setEvento={this.setEvento}

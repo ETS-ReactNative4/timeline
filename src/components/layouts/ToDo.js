@@ -33,14 +33,14 @@ class ToDo extends React.Component {
       tarefa: '',
       tarefas: [],
       tarefasTodas: [],
-
       checkedB: false
     };
   }
 
   componentWillMount() {
-    /* const { tarefas, tarefasTodas } = this.state;
-    this.setState({ tarefasTodas: tarefas });*/
+    const { tarefas } = this.props;
+    this.setState({ tarefas: tarefas });
+    this.setState({ tarefasTodas: tarefas });
   }
 
   handleChange = input => e => {
@@ -51,29 +51,37 @@ class ToDo extends React.Component {
     let tarefa = input;
 
     tarefa.concluida = !tarefa.concluida;
-    this.handleCommentEdit(tarefa.key, !tarefa.concluida);
+    tarefa.dt_delete = new Date();
+    this.handleCommentEdit(tarefa.id, !tarefa.concluida);
+
+    console.log(tarefa);
+    this.editaEvento(tarefa);
   };
 
   handleCommentEdit = (key, checked) => {
     this.setState({
       tarefas: this.state.tarefas.map(el =>
-        el.key === key ? Object.assign({}, el, { checked: checked }) : el
+        el.id === key ? Object.assign({}, el, { checked: checked }) : el
       )
     });
   };
 
   handleChangeLista = name => event => {
-    const { tarefas, tarefasTodas } = this.state;
+    const { tarefasTodas } = this.state;
+    const { tarefas } = this.props;
 
     this.setState({ [name]: event.target.checked });
     console.log(event.target.checked);
-    /*
+    console.log(tarefasTodas, tarefas);
+
     if (event.target.checked) {
-       this.setState({ tarefas: tarefasTodas }); 
+      this.setState({ tarefas: tarefasTodas });
     } else {
-      let tarefasExibe = tarefas.filter(tarefa => tarefa.concluida == true);
+      let tarefasExibe = tarefasTodas.filter(
+        tarefa => tarefa.dt_delete == true
+      );
       this.setState({ tarefas: tarefasExibe });
-    }*/
+    }
   };
 
   addItem = e => {
@@ -84,7 +92,7 @@ class ToDo extends React.Component {
     }
     let tarefa = {
       descricao: this.state.tarefa,
-      key: Date.now(),
+      id: Date.now(),
       concluida: false,
       dt_evento: new Date(),
       tipoEvento: 5,
@@ -122,11 +130,32 @@ class ToDo extends React.Component {
       });
   }
 
+  editaEvento(tarefa) {
+    let { empresa } = this.props;
+    empresa.envolvimentoEmpresa = 1;
+    tarefa.empresas = [empresa];
+    const data = { evento: tarefa };
+
+    fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: {
+        'x-access-token': window.sessionStorage.token,
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+
+      .catch(function(err) {
+        console.error(err);
+      });
+  }
+
   render() {
-    const { classes } = this.props;
     const { tarefas } = this.props;
-    console.log(tarefas);
-    const { tarefa, checked, checkedB } = this.state;
+    const { classes } = this.props;
+    const { tarefa, checkedB } = this.state;
 
     return (
       <div>
@@ -159,7 +188,7 @@ class ToDo extends React.Component {
               />
               <List dense>
                 {tarefas.map(tarefa => (
-                  <ListItem key={tarefa.key} button>
+                  <ListItem key={tarefa.id} button>
                     <ListItemText
                       primary={tarefa.descricao}
                       className={
