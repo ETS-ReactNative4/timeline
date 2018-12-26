@@ -332,10 +332,10 @@ class FormEvent extends React.Component {
                           Tipo Evento
                         </InputLabel>
                         <Select
-                          value={evento.tipoEvento}
-                          onChange={handleChange('tipoEvento')}
+                          value={evento.tipo_envolvimento_id}
+                          onChange={handleChange('tipo_envolvimento_id')}
                           inputProps={{
-                            name: 'tipoEvento',
+                            name: 'tipo_envolvimento_id',
                             id: 'tipo-evento-simple'
                           }}
                         >

@@ -11,6 +11,7 @@ import FormControl from '@material-ui/core/FormControl';
 import logo from '../../bancodobrasil.png';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CardGrid from './CardGrid';
+import { Avatar } from '@material-ui/core';
 
 //https://uce.intranet.bb.com.br/timeline/?visao=1&bloco_origem=4&cnpj=05.721.752/0001-65&cod_pais=23&mci=509277368&nm_prefixo_redex=FRANKFURT%20ALEMANHA&nome=ADIDAS%20AG&pais=ALEMANHA&prefixo_redex=720&tabela_origem=2
 
@@ -84,11 +85,11 @@ class Header extends React.Component {
       envolvimentoParticipantesEmpresa: 1,
       dependencias: [],
       envolvimentoDependencia: 1,
-      tipoEvento: 1,
+      tipo_envolvimento_id: 1,
       status: 1,
       comentario: '',
       id: undefined,
-      tarefas: [],
+
       dados: {}
     };
   }
@@ -98,6 +99,7 @@ class Header extends React.Component {
   };
 
   componentWillMount() {
+    const { user } = this.props;
     this.setState({ visao: window.sessionStorage.visao || 1 });
     let empresa = window.sessionStorage.objetoBusca
       ? JSON.parse(window.sessionStorage.objetoBusca)
@@ -106,8 +108,14 @@ class Header extends React.Component {
     if (parseInt(params.get('visao'), 10)) {
       empresa = this.handleParams(params);
     }
-
-    this.setState();
+    if (user) {
+      this.myCallback({
+        nome: user.NM_FUN,
+        chave: user.CD_USU,
+        envolvimento: 1,
+        prefixo: user.CD_PRF_DEPE_ATU
+      });
+    }
 
     this.getEventos(empresa);
   }
@@ -181,7 +189,7 @@ class Header extends React.Component {
     this.setState({ descricao: '' });
     this.setState({ dt_create: new Date() });
     this.setState({ dt_evento: new Date() });
-    this.setState({ tipoEvento: 1 });
+    this.setState({ tipo_envolvimento_id: 1 });
     this.setState({ status: 1 });
     this.setState({ dependencias: [] });
     this.setState({ funcionarios: [] });
@@ -192,7 +200,7 @@ class Header extends React.Component {
     this.setState({ descricao: data.descricao });
     this.setState({ dt_create: data.dt_create });
     this.setState({ dt_evento: data.dt_evento });
-    this.setState({ tipoEvento: data.tipo_envolvimento_id });
+    this.setState({ tipo_envolvimento_id: data.tipo_envolvimento_id });
     this.setState({ status: data.status });
 
     this.setState({ dependencias: data.dependencias });
@@ -236,8 +244,6 @@ class Header extends React.Component {
   };
 
   getDashboardData = empresa => {
-    console.log(empresa);
-
     fetch('https://uce.intranet.bb.com.br/api-timeline/v1/eventos/dashboard', {
       method: 'POST',
       body: JSON.stringify({ empresa: empresa }),
@@ -281,7 +287,6 @@ class Header extends React.Component {
   };
 
   myCallbackEmpresas = empresaDataChild => {
-    console.log(empresaDataChild);
     this.setState({
       empresas: [
         ...this.state.empresas,
@@ -310,7 +315,11 @@ class Header extends React.Component {
   getEventos = empresa => {
     fetch(this.state.urlEventos, {
       method: 'POST',
-      body: JSON.stringify({ empresa: empresa }),
+      body: JSON.stringify({
+        empresa: empresa,
+        tipoEvento: '[1, 2, 3, 4]',
+        excluidos: true
+      }),
       headers: {
         'x-access-token': window.sessionStorage.token,
         Accept: 'application/json, text/plain, */*',
@@ -321,22 +330,25 @@ class Header extends React.Component {
       .then(data => {
         const eventosFiltrado = data.timeline
           ? data.timeline.filter(el => {
-              if (![5, 6].includes(el.tipo_envolvimento_id)) {
+              if (!el.dt_delete) {
                 return el;
               }
             })
           : [];
 
-        const tarefasFiltradas = data.timeline
+        /*     const tarefasFiltradas = data.timeline
           ? data.timeline.filter(el => {
               if ([5, 6].includes(el.tipo_envolvimento_id)) {
                 return el;
               }
             })
-          : [];
+          : [];*/
+
+        console.log(eventosFiltrado);
+
         this.setState({ eventos: eventosFiltrado });
 
-        this.setState({ tarefas: tarefasFiltradas });
+        /* this.setState({ tarefas: tarefasFiltradas });*/
       })
       .then(this.getDashboardData(empresa))
 
@@ -347,10 +359,11 @@ class Header extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { value, url, eventos, currentLocale, tarefas } = this.state;
+    const { value, url, eventos, currentLocale } = this.state;
+    const { user } = this.props;
     const {
       descricao,
-      tipoEvento,
+      tipo_envolvimento_id,
       status,
       dt_evento,
       envolvimento,
@@ -365,7 +378,7 @@ class Header extends React.Component {
     } = this.state;
     const evento = {
       descricao,
-      tipoEvento,
+      tipo_envolvimento_id,
       status,
       dt_evento,
       envolvimento,
@@ -383,9 +396,21 @@ class Header extends React.Component {
           <AppBar position="static" color="primary">
             <Toolbar>
               <img style={{ margin: 8 }} src={logo} />
-              <Typography variant="h6" color="inherit" noWrap>
+              <Typography
+                variant="h6"
+                color="inherit"
+                noWrap
+                className={classes.topBar}
+              >
                 UCE Timeline
               </Typography>
+              <Avatar
+                alt={this.props.user.CD_USU}
+                src={
+                  'https://humanograma.intranet.bb.com.br/avatar/' +
+                  this.props.user.CD_USU
+                }
+              />
             </Toolbar>
             <Toolbar className={classes.subBar}>
               <FormControl fullWidth>
@@ -400,11 +425,11 @@ class Header extends React.Component {
               <CardGrid
                 empresa={empresa}
                 eventos={eventos}
-                tarefas={tarefas}
                 dados={dados}
                 getEventos={this.getEventos}
                 myCallbackOpenDialog={this.myCallbackOpenDialog}
                 setEvento={this.setEvento}
+                user={user}
                 {...props}
               />
             )}
@@ -443,7 +468,8 @@ const styles = theme => ({
   },
   root: {
     width: '100%'
-  }
+  },
+  topBar: { flexGrow: 1 }
 });
 
 Header.propTypes = {

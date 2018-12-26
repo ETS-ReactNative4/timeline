@@ -34,16 +34,18 @@ class CardGrid extends React.Component {
       empresa,
       tarefas,
       dados,
-      getEventos
+      getEventos,
+      user
     } = this.props;
 
     return (
       <div>
         <Dashboard empresa={empresa} dados={dados} />
         <ToDo
+          user={user}
           empresa={empresa}
           tarefas={tarefas}
-          getEventos={this.props.getEventos}
+          getEventos={getEventos}
         />
         <Grid
           className={classNames(classes.container)}

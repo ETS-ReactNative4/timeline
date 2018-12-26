@@ -28,8 +28,10 @@ class ToDo extends React.Component {
     super(props);
     this.addItem = this.addItem.bind(this);
     this.handleToggle = this.handleToggle.bind(this);
+    this.getEventos = this.getEventos.bind(this);
 
     this.state = {
+      ...props,
       tarefa: '',
       tarefas: [],
       tarefasTodas: [],
@@ -38,9 +40,8 @@ class ToDo extends React.Component {
   }
 
   componentWillMount() {
-    const { tarefas } = this.props;
-    this.setState({ tarefas: tarefas });
-    this.setState({ tarefasTodas: tarefas });
+    const { empresa } = this.props;
+    this.getEventos(empresa);
   }
 
   handleChange = input => e => {
@@ -51,42 +52,35 @@ class ToDo extends React.Component {
     let tarefa = input;
 
     tarefa.concluida = !tarefa.concluida;
-    tarefa.dt_delete = new Date();
-    this.handleCommentEdit(tarefa.id, !tarefa.concluida);
+    if (!tarefa.concluida) {
+      delete tarefa.dt_delete;
+    } else {
+      tarefa.dt_delete = new Date();
+    }
 
-    console.log(tarefa);
+    /* this.handleCommentEdit(tarefa.id, !tarefa.concluida);*/
+
     this.editaEvento(tarefa);
   };
 
-  handleCommentEdit = (key, checked) => {
+  /*handleCommentEdit = (key, checked) => {
     this.setState({
       tarefas: this.state.tarefas.map(el =>
-        el.id === key ? Object.assign({}, el, { checked: checked }) : el
-      )
+        el.id === key ? Object.assign({}, el  )
+    });
+  };*/
+
+  handleChangeLista = name => event => {
+    const { tarefasTodas, tarefas } = this.state;
+
+    this.setState({ [name]: event.target.checked });
+    this.setState({
+      tarefas: this.getVisibleTodos(tarefasTodas, event.target.checked)
     });
   };
 
-  handleChangeLista = name => event => {
-    const { tarefasTodas } = this.state;
-    const { tarefas } = this.props;
-
-    this.setState({ [name]: event.target.checked });
-    console.log(event.target.checked);
-    console.log(tarefasTodas, tarefas);
-
-    if (event.target.checked) {
-      this.setState({ tarefas: tarefasTodas });
-    } else {
-      let tarefasExibe = tarefasTodas.filter(
-        tarefa => tarefa.dt_delete == true
-      );
-      this.setState({ tarefas: tarefasExibe });
-    }
-  };
-
   addItem = e => {
-    e.preventDefault();
-
+    let { empresa, user } = this.props;
     if (this.state.tarefa == '') {
       return;
     }
@@ -94,8 +88,25 @@ class ToDo extends React.Component {
       descricao: this.state.tarefa,
       id: Date.now(),
       dt_evento: new Date(),
-      tipoEvento: 5,
-      status: 3
+      tipo_envolvimento_id: 5,
+      status: 3,
+      funcionarios: [
+        {
+          id: 1,
+          nome: user.NM_FUN,
+          chave: user.CD_USU,
+          envolvimento: 1,
+          prefixo: user.CD_PRF_DEPE_ATU
+        }
+      ],
+      dependencias: [
+        {
+          nome: user.NM_PSC_RDZ,
+          uor: user.CD_UOR_PSC,
+          envolvimentoDependencia: 1,
+          prefixo: user.CD_PRF_DEPE_ATU
+        }
+      ]
     };
     this.setState({
       tarefas: [...this.state.tarefas, tarefa]
@@ -105,12 +116,24 @@ class ToDo extends React.Component {
     });
 
     this.enviaEvento(tarefa);
+    e.preventDefault();
   };
 
   enviaEvento(tarefa) {
-    let { empresa } = this.props;
+    let { empresa, user } = this.props;
+
     empresa.envolvimentoEmpresa = 1;
     tarefa.empresas = [empresa];
+    tarefa.funcionarios = [
+      {
+        id: 1,
+        nome: user.NM_FUN,
+        chave: user.CD_USU,
+        envolvimento: 1,
+        prefixo: user.CD_PRF_DEPE_ATU
+      }
+    ];
+
     const data = { evento: tarefa };
 
     fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
@@ -122,13 +145,55 @@ class ToDo extends React.Component {
         'Content-Type': 'application/json'
       }
     })
-      .then(response => response.json())
-      .then(this.props.getEventos(empresa))
+      .then(response => console.log(response.json()))
+      .then(this.getEventos(empresa))
       .catch(function(err) {
         console.error(err);
       });
   }
 
+  getEventos = empresa => {
+    fetch('https://uce.intranet.bb.com.br/api-timeline/v1/eventos/empresa', {
+      method: 'POST',
+      body: JSON.stringify({
+        empresa: empresa,
+        tipoEvento: '[5,6]',
+        excluidos: false
+      }),
+
+      headers: {
+        'x-access-token': window.sessionStorage.token,
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        const tarefasFiltradas = data.timeline;
+
+        this.setState({
+          tarefas: this.getVisibleTodos(tarefasFiltradas, this.state.checkedB)
+        });
+
+        this.setState({
+          tarefasTodas: tarefasFiltradas
+        });
+      })
+
+      .catch(function(err) {
+        console.error(err);
+      });
+  };
+
+  getVisibleTodos = (tarefas, filter) => {
+    switch (filter) {
+      case false:
+        return tarefas.filter(t => !t.dt_delete);
+      case true:
+      default:
+        return tarefas;
+    }
+  };
   editaEvento(tarefa) {
     let { empresa } = this.props;
     empresa.envolvimentoEmpresa = 1;
@@ -145,14 +210,14 @@ class ToDo extends React.Component {
       }
     })
       .then(response => response.json())
-
+      .then(this.getEventos(empresa))
       .catch(function(err) {
         console.error(err);
       });
   }
 
   render() {
-    const { tarefas } = this.props;
+    const { tarefas } = this.state;
     const { classes } = this.props;
     const { tarefa, checkedB } = this.state;
 
@@ -191,11 +256,14 @@ class ToDo extends React.Component {
                     <ListItemText
                       primary={tarefa.descricao}
                       className={
-                        tarefa.concluida ? classes.tracado : classes.naoTracado
+                        tarefa.dt_delete ? classes.tracado : classes.naoTracado
                       }
                     />
                     <ListItemSecondaryAction>
-                      <Checkbox onClick={this.handleToggle(tarefa)} />
+                      <Checkbox
+                        onClick={this.handleToggle(tarefa)}
+                        checked={tarefa.dt_delete}
+                      />
                     </ListItemSecondaryAction>
                   </ListItem>
                 ))}
