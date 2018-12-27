@@ -20,6 +20,9 @@ import { Menu, MenuItem, Divider } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 
 const styles = theme => ({
+  flex: {
+    display: 'flex'
+  },
   card: {
     width: '100%'
   },
@@ -185,21 +188,24 @@ class EventCard extends React.Component {
                 Participantes BB
               </Typography>
               <Divider />
-
-              {evento.funcionarios
-                ? evento.funcionarios.map(funci => {
-                    return (
-                      <Avatar
-                        key={funci.chave}
-                        className={classes.smallAvatar}
-                        src={`https://humanograma.intranet.bb.com.br/avatar/${
-                          funci.chave
-                        }`}
-                      />
-                    );
-                  })
-                : ''}
-
+              <div className={classes.flex}>
+                {evento.funcionarios
+                  ? evento.funcionarios.map(funci => {
+                      return (
+                        <div>
+                          <Avatar
+                            alt={funci.nome}
+                            key={funci.chave}
+                            className={classes.smallAvatar}
+                            src={`https://humanograma.intranet.bb.com.br/avatar/${
+                              funci.chave
+                            }`}
+                          />
+                        </div>
+                      );
+                    })
+                  : ''}
+              </div>
               <Typography
                 variant="caption"
                 gutterBottom
@@ -209,11 +215,11 @@ class EventCard extends React.Component {
               </Typography>
               <Divider />
 
-              <Typography variant="body1">
-                {evento.dependencias
-                  ? evento.dependencias.map(dep => dep.prefixo)
-                  : ''}
-              </Typography>
+              {evento.dependencias
+                ? evento.dependencias.map(dep => (
+                    <Typography variant="body1">{dep.prefixo}</Typography>
+                  ))
+                : ''}
 
               <Typography
                 variant="caption"
@@ -223,13 +229,12 @@ class EventCard extends React.Component {
                 Empresas
               </Typography>
               <Divider />
-              <Typography variant="body1">
-                {evento.empresas
-                  ? evento.empresas.map(empresa => {
-                      return empresa.nome;
-                    })
-                  : ''}
-              </Typography>
+
+              {evento.empresas
+                ? evento.empresas.map(empresa => (
+                    <Typography variant="body1"> {empresa.nome}</Typography>
+                  ))
+                : ''}
             </CardContent>
             <CardActions className={classes.actions} disableActionSpacing>
               <SimpleExpansionPanel evento={evento} />

@@ -180,6 +180,8 @@ class Header extends React.Component {
   };
 
   setEventos = data => {
+    console.log(data);
+
     this.setState({ eventos: data });
   };
 
@@ -436,7 +438,7 @@ class Header extends React.Component {
             dependencias={this.state.dependencias}
             clearEvento={this.clearEvento}
             handleChange={this.handleChange}
-            getEventos={this.getEventos}
+            setEventos={this.setEventos}
             evento={evento}
           />
         </MuiThemeProvider>

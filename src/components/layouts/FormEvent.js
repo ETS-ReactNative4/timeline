@@ -124,8 +124,6 @@ class FormEvent extends React.Component {
 
   handleClose = () => {
     this.props.myCallbackOpenDialog(false);
-
-    this.props.clearEvento();
   };
 
   handleDateChange = date => {
@@ -143,7 +141,6 @@ class FormEvent extends React.Component {
     const { nome, telefone, email, envolvimento } = this.state;
     let errors = {};
     let formIsValid = true;
-    console.log(nome, telefone, email, envolvimento);
 
     if (!nome || nome === '') {
       formIsValid = false;
@@ -196,11 +193,13 @@ class FormEvent extends React.Component {
     event.preventDefault();
     let { evento, empresa } = this.props;
 
-    const data = { evento: evento };
-
     fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
       method: evento.id ? 'PUT' : 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        evento: evento,
+        empresa: empresa,
+        tipoEvento: '[1,2,3,4]'
+      }),
       headers: {
         'x-access-token': window.sessionStorage.token,
         Accept: 'application/json, text/plain, */*',
@@ -211,7 +210,7 @@ class FormEvent extends React.Component {
 
       .then(this.props.clearEvento())
       .then(this.props.myCallbackOpenDialog(false))
-      .then(this.props.getEventos(empresa))
+      .then(response => this.props.setEventos(response.timeline))
       .catch(function(err) {
         console.error(err);
       });

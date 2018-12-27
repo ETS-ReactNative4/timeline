@@ -233,71 +233,69 @@ class ToDo extends React.Component {
     const { classes, title } = this.props;
 
     return (
-      <div>
-        <Paper className={classes.paper}>
-          <div className={classes.header}>
-            <Typography variant="subtitle1">{title}</Typography>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={this.state.checkedB}
-                  onChange={this.handleChangeLista('checkedB')}
-                  value="checkedB"
-                  color="primary"
-                />
-              }
-              label="Exibe concluídas"
-            />
-          </div>
-          <Typography variant="h4">{tarefas.length}</Typography>
-
-          <List dense className={classes.root}>
-            {tarefas.map((tarefa, index) => (
-              <ListItem key={tarefa.id} button>
-                <ListItemText
-                  primary={tarefa.descricao}
-                  secondary={
-                    tarefa.dt_delete
-                      ? 'Concluído: ' +
-                        moment(tarefa.dt_delete)
-                          .locale('pt-BR')
-                          .format('DD/MM/YYYY')
-                      : moment(tarefa.dt_create)
-                          .locale('pt-BR')
-                          .format('DD/MM/YYYY')
-                  }
-                />
-                <ListItemSecondaryAction>
-                  <Checkbox
-                    onClick={this.handleToggle(tarefa)}
-                    checked={tarefa.dt_delete}
-                  />
-                </ListItemSecondaryAction>
-              </ListItem>
-            ))}
-          </List>
-
-          <TextField
-            label="Tarefa"
-            placeholder="Tarefa"
-            multiline
-            className={classes.inputs}
-            margin="normal"
-            fullWidth
-            value={tarefa}
-            onChange={this.handleChange('tarefa')}
+      <Paper className={classes.paper}>
+        <div className={classes.header}>
+          <Typography variant="subtitle1">{title}</Typography>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={this.state.checkedB}
+                onChange={this.handleChangeLista('checkedB')}
+                value="checkedB"
+                color="primary"
+              />
+            }
+            label="Exibe concluídas"
           />
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            type="submit"
-            onClick={this.addItem}
-          >
-            Adicionar Tarefa
-          </Button>
-        </Paper>
-      </div>
+        </div>
+        <Typography variant="h4">{tarefas.length}</Typography>
+
+        <List dense className={classes.root}>
+          {tarefas.map((tarefa, index) => (
+            <ListItem key={tarefa.id} button>
+              <ListItemText
+                primary={tarefa.descricao}
+                secondary={
+                  tarefa.dt_delete
+                    ? 'Concluído: ' +
+                      moment(tarefa.dt_delete)
+                        .locale('pt-BR')
+                        .format('DD/MM/YYYY')
+                    : moment(tarefa.dt_create)
+                        .locale('pt-BR')
+                        .format('DD/MM/YYYY')
+                }
+              />
+              <ListItemSecondaryAction>
+                <Checkbox
+                  onClick={this.handleToggle(tarefa)}
+                  checked={tarefa.dt_delete}
+                />
+              </ListItemSecondaryAction>
+            </ListItem>
+          ))}
+        </List>
+
+        <TextField
+          label="Tarefa"
+          placeholder="Tarefa"
+          multiline
+          className={classes.inputs}
+          margin="normal"
+          fullWidth
+          value={tarefa}
+          onChange={this.handleChange('tarefa')}
+        />
+        <Button
+          variant="contained"
+          color="primary"
+          className={classes.button}
+          type="submit"
+          onClick={this.addItem}
+        >
+          Adicionar Tarefa
+        </Button>
+      </Paper>
     );
   }
 }

@@ -79,15 +79,10 @@ class EnhancedTableHead extends React.Component {
             return (
               <TableCell
                 key={row.id}
-                numeric={row.numeric}
                 padding={row.disablePadding ? 'none' : 'default'}
                 sortDirection={orderBy === row.id ? order : false}
               >
-                <Tooltip
-                  title="Sort"
-                  placement={row.numeric ? 'bottom-end' : 'bottom-start'}
-                  enterDelay={300}
-                >
+                <Tooltip title="Sort" placement="bottom-start" enterDelay={300}>
                   <TableSortLabel
                     active={orderBy === row.id}
                     direction={order}
@@ -307,8 +302,8 @@ class EnhancedTable extends React.Component {
                       <TableCell component="th" scope="row" padding="none">
                         {n.nome}
                       </TableCell>
-                      <TableCell numeric>{n.prefixo}</TableCell>
-                      <TableCell numeric>{n.envolvimento}</TableCell>
+                      <TableCell>{n.prefixo}</TableCell>
+                      <TableCell>{n.envolvimento}</TableCell>
                     </TableRow>
                   );
                 })}
