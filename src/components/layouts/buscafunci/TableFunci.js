@@ -46,11 +46,11 @@ function getSorting(order, orderBy) {
 }
 
 const rows = [
-  { id: 'nome', numeric: false, disablePadding: true, label: 'Nome' },
-  { id: 'chave', numeric: true, disablePadding: false, label: 'Chave' },
+  { id: 'nome', disablePadding: true, label: 'Nome' },
+  { id: 'chave', disablePadding: false, label: 'Chave' },
   {
     id: 'envolvimento',
-    numeric: false,
+
     disablePadding: false,
     label: 'Envolvimento'
   }
@@ -84,15 +84,10 @@ class EnhancedTableHead extends React.Component {
             return (
               <TableCell
                 key={row.id}
-                numeric={row.numeric}
                 padding={row.disablePadding ? 'none' : 'default'}
                 sortDirection={orderBy === row.id ? order : false}
               >
-                <Tooltip
-                  title="Sort"
-                  placement={row.numeric ? 'bottom-end' : 'bottom-start'}
-                  enterDelay={300}
-                >
+                <Tooltip title="Sort" placement="bottom-start" enterDelay={300}>
                   <TableSortLabel
                     active={orderBy === row.id}
                     direction={order}
@@ -316,8 +311,8 @@ class EnhancedTable extends React.Component {
                       <TableCell component="th" scope="row" padding="none">
                         {n.nome}
                       </TableCell>
-                      <TableCell numeric>{n.chave}</TableCell>
-                      <TableCell numeric>{n.envolvimento}</TableCell>
+                      <TableCell>{n.chave}</TableCell>
+                      <TableCell>{n.envolvimento}</TableCell>
                     </TableRow>
                   );
                 })}

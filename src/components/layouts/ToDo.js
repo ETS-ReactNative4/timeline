@@ -1,7 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
-import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import moment from 'moment';
 import {
@@ -17,12 +15,20 @@ import {
   List,
   Switch
 } from '@material-ui/core';
-import Divider from '@material-ui/core/Divider';
 
 const styles = theme => ({
   paper: { padding: theme.spacing.unit * 2 },
   tracado: { textDecorationLine: 'line-through' },
-  root: { position: 'relative', overflow: 'auto', maxHeight: 300 }
+  root: {
+    position: 'relative',
+    overflow: 'auto',
+    maxHeight: 300,
+    minHeight: 300
+  },
+  header: {
+    display: 'flex',
+    justifyContent: 'space-between'
+  }
 });
 
 class ToDo extends React.Component {
@@ -38,6 +44,10 @@ class ToDo extends React.Component {
       tarefasTodas: [],
       checkedB: false
     };
+
+    if (this.props.empresa !== {}) {
+      this.getEventos(this.props.empresa);
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -86,7 +96,7 @@ class ToDo extends React.Component {
     let tarefa = {
       descricao: this.state.tarefa,
       dt_evento: new Date(),
-      tipo_envolvimento_id: 5,
+      tipo_envolvimento_id: this.props.tipoEvento,
       status: 3,
       funcionarios: [
         {
@@ -112,7 +122,6 @@ class ToDo extends React.Component {
   };
 
   enviaEvento = () => {
-    let { empresa } = this.props;
     const tarefa = this.criaTarefa();
 
     fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
@@ -120,7 +129,7 @@ class ToDo extends React.Component {
       body: JSON.stringify({
         evento: tarefa,
         empresa: this.props.empresa,
-        tipoEvento: '[5,6]'
+        tipoEvento: '[' + this.props.tipoEvento + ']'
       }),
       headers: {
         'x-access-token': window.sessionStorage.token,
@@ -150,7 +159,7 @@ class ToDo extends React.Component {
       method: 'POST',
       body: JSON.stringify({
         empresa: empresa,
-        tipoEvento: '[5,6]',
+        tipoEvento: '[' + this.props.tipoEvento + ']',
         excluidos: false
       }),
 
@@ -161,6 +170,7 @@ class ToDo extends React.Component {
       }
     })
       .then(response => response.json())
+
       .then(data => {
         const tarefasFiltradas = data.timeline;
 
@@ -193,7 +203,7 @@ class ToDo extends React.Component {
       body: JSON.stringify({
         evento: tarefa,
         empresa: this.props.empresa,
-        tipoEvento: '[5,6]'
+        tipoEvento: '[' + this.props.tipoEvento + ']'
       }),
       headers: {
         'x-access-token': window.sessionStorage.token,
@@ -220,91 +230,73 @@ class ToDo extends React.Component {
 
   render() {
     const { tarefas, tarefa } = this.state;
-    const { classes } = this.props;
+    const { classes, title } = this.props;
 
     return (
       <div>
-        <Grid
-          className={classNames(classes.container)}
-          container
-          item
-          direction="row"
-          justify="center"
-          alignItems="center"
-          spacing={16}
-          sm={12}
-          md={12}
-          lg={12}
-        >
-          <Grid item lg={6}>
-            <Paper className={classes.paper}>
-              <Typography variant="subtitle1">Pendências BB</Typography>
+        <Paper className={classes.paper}>
+          <div className={classes.header}>
+            <Typography variant="subtitle1">{title}</Typography>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={this.state.checkedB}
+                  onChange={this.handleChangeLista('checkedB')}
+                  value="checkedB"
+                  color="primary"
+                />
+              }
+              label="Exibe concluídas"
+            />
+          </div>
+          <Typography variant="h4">{tarefas.length}</Typography>
 
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={this.state.checkedB}
-                    onChange={this.handleChangeLista('checkedB')}
-                    value="checkedB"
-                    color="primary"
+          <List dense className={classes.root}>
+            {tarefas.map((tarefa, index) => (
+              <ListItem key={tarefa.id} button>
+                <ListItemText
+                  primary={tarefa.descricao}
+                  secondary={
+                    tarefa.dt_delete
+                      ? 'Concluído: ' +
+                        moment(tarefa.dt_delete)
+                          .locale('pt-BR')
+                          .format('DD/MM/YYYY')
+                      : moment(tarefa.dt_create)
+                          .locale('pt-BR')
+                          .format('DD/MM/YYYY')
+                  }
+                />
+                <ListItemSecondaryAction>
+                  <Checkbox
+                    onClick={this.handleToggle(tarefa)}
+                    checked={tarefa.dt_delete}
                   />
-                }
-                label="Exibe concluídas"
-              />
-              <List dense className={classes.root}>
-                {tarefas.map((tarefa, index) => (
-                  <ListItem key={tarefa.id} button>
-                    <ListItemText
-                      primary={tarefa.descricao}
-                      secondary={
-                        tarefa.dt_delete
-                          ? 'Concluído: ' +
-                            moment(tarefa.dt_delete)
-                              .locale('pt-BR')
-                              .format('DD/MM/YYYY')
-                          : moment(tarefa.dt_create)
-                              .locale('pt-BR')
-                              .format('DD/MM/YYYY')
-                      }
-                    />
-                    <ListItemSecondaryAction>
-                      <Checkbox
-                        onClick={this.handleToggle(tarefa)}
-                        checked={tarefa.dt_delete}
-                      />
-                    </ListItemSecondaryAction>
-                  </ListItem>
-                ))}
-              </List>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+          </List>
 
-              <TextField
-                label="Tarefa"
-                placeholder="Tarefa"
-                multiline
-                className={classes.inputs}
-                margin="normal"
-                fullWidth
-                value={tarefa}
-                onChange={this.handleChange('tarefa')}
-              />
-              <Button
-                variant="contained"
-                color="primary"
-                className={classes.button}
-                type="submit"
-                onClick={this.addItem}
-              >
-                Adicionar Tarefa
-              </Button>
-            </Paper>
-          </Grid>
-          <Grid item lg={6}>
-            <Paper>
-              <Typography variant="h5">Pendências Empresa</Typography>
-              <Divider />
-            </Paper>
-          </Grid>
-        </Grid>
+          <TextField
+            label="Tarefa"
+            placeholder="Tarefa"
+            multiline
+            className={classes.inputs}
+            margin="normal"
+            fullWidth
+            value={tarefa}
+            onChange={this.handleChange('tarefa')}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            type="submit"
+            onClick={this.addItem}
+          >
+            Adicionar Tarefa
+          </Button>
+        </Paper>
       </div>
     );
   }

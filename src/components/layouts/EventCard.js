@@ -105,11 +105,9 @@ class EventCard extends React.Component {
     let { evento, empresa } = this.props;
     evento.dt_delete = new Date();
 
-    const data = { evento: evento, empresa: empresa };
-
     fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: { evento: evento, empresa: empresa, tipoEvento: '[1,2,3,4]' },
       headers: {
         'x-access-token': window.sessionStorage.token,
         Accept: 'application/json, text/plain, */*',

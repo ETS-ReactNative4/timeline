@@ -69,11 +69,7 @@ class App extends Component {
   render() {
     return (
       <Router initialEntries={['/timeline']} initialIndex={0}>
-        <div className="App">
-          <Route
-            render={props => <Header {...props} user={this.state.user} />}
-          />
-        </div>
+        <Route render={props => <Header {...props} user={this.state.user} />} />
       </Router>
     );
   }

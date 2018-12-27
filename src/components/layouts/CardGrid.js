@@ -4,20 +4,22 @@ import classNames from 'classnames';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import EventCard from './EventCard';
-import { Typography, Card } from '@material-ui/core';
+import { Typography, Card, Divider } from '@material-ui/core';
 import red from '@material-ui/core/colors/red';
 import Dashboard from './Dashboard';
 import ToDo from './ToDo';
 
 const styles = theme => ({
+  root: {
+    flexGrow: 1,
+    paddingLeft: theme.spacing.unit * 2,
+    paddingTop: theme.spacing.unit * 2
+  },
   cardVazio: {
     color: red[500],
     paddingLeft: theme.spacing.unit * 1,
     paddingRight: theme.spacing.unit * 1,
     margin: theme.spacing.unit * 2
-  },
-  container: {
-    /*  margin: 'auto'*/
   }
 });
 
@@ -30,23 +32,63 @@ class CardGrid extends React.Component {
       setEvento,
       setEventos,
       empresa,
-      tarefas,
       dados,
-      getEventos,
       user
     } = this.props;
 
     return (
       <div>
-        <Dashboard empresa={empresa} dados={dados} />
-        <ToDo
-          user={user}
-          empresa={empresa}
-          tarefas={tarefas}
-          getEventos={getEventos}
-        />
         <Grid
-          className={classNames(classes.container)}
+          className={classes.root}
+          container
+          item
+          direction="row"
+          justify="center"
+          alignItems="center"
+          spacing={16}
+          sm={12}
+          md={12}
+          lg={12}
+        >
+          <Grid item xs={12} md={12} lg={12} className={classes.root}>
+            <Typography variant="h4">{empresa.nome}</Typography>
+            <Typography variant="subtitle1" color="textSecondary">
+              {empresa.pais}
+            </Typography>
+          </Grid>
+          <Dashboard empresa={empresa} dados={dados} />
+        </Grid>
+        <Grid
+          className={classes.root}
+          container
+          item
+          direction="row"
+          justify="center"
+          alignItems="center"
+          spacing={16}
+          sm={12}
+          md={12}
+          lg={12}
+        >
+          <Grid item lg={6}>
+            <ToDo
+              tipoEvento={5}
+              title={'Pendências BB'}
+              user={user}
+              empresa={empresa}
+            />
+          </Grid>
+          <Grid item lg={6}>
+            <ToDo
+              tipoEvento={6}
+              title={'Pendências Empresa'}
+              user={user}
+              empresa={empresa}
+            />
+          </Grid>
+        </Grid>
+        <Grid
+          className={classes.root}
           container
           item
           direction="column"

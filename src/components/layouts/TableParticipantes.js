@@ -46,17 +46,17 @@ function getSorting(order, orderBy) {
 }
 
 const rows = [
-  { id: 'nome', numeric: false, disablePadding: true, label: 'Nome' },
+  { id: 'nome', disablePadding: true, label: 'Nome' },
   {
     id: 'evolvimento',
-    numeric: false,
+
     disablePadding: true,
     label: 'Evolvimento'
   },
 
-  { id: 'empresa', numeric: false, disablePadding: true, label: 'Empresa' },
-  { id: 'telefone', numeric: false, disablePadding: true, label: 'Telefone' },
-  { id: 'email', numeric: false, disablePadding: true, label: 'Email' }
+  { id: 'empresa', disablePadding: true, label: 'Empresa' },
+  { id: 'telefone', disablePadding: true, label: 'Telefone' },
+  { id: 'email', disablePadding: true, label: 'Email' }
 ];
 
 class EnhancedTableHead extends React.Component {
@@ -87,15 +87,10 @@ class EnhancedTableHead extends React.Component {
             return (
               <TableCell
                 key={row.id}
-                numeric={row.numeric}
                 padding={row.disablePadding ? 'none' : 'default'}
                 sortDirection={orderBy === row.id ? order : false}
               >
-                <Tooltip
-                  title="Sort"
-                  placement={row.numeric ? 'bottom-end' : 'bottom-start'}
-                  enterDelay={300}
-                >
+                <Tooltip title="Sort" placement="bottom-start" enterDelay={300}>
                   <TableSortLabel
                     active={orderBy === row.id}
                     direction={order}
@@ -297,7 +292,7 @@ class EnhancedTable extends React.Component {
             <TableBody>
               {stableSort(data, getSorting(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map(n => {
+                .map((n, index) => {
                   const isSelected = this.isSelected(n.id);
                   return (
                     <TableRow
@@ -315,11 +310,11 @@ class EnhancedTable extends React.Component {
                       <TableCell component="th" scope="row" padding="none">
                         {n.nome}
                       </TableCell>
-                      <TableCell numeric>{n.envolvimento}</TableCell>
+                      <TableCell>{n.envolvimento}</TableCell>
 
-                      <TableCell numeric>{n.empresa}</TableCell>
-                      <TableCell numeric>{n.telefone}</TableCell>
-                      <TableCell numeric>{n.email}</TableCell>
+                      <TableCell>{n.empresa}</TableCell>
+                      <TableCell>{n.telefone}</TableCell>
+                      <TableCell>{n.email}</TableCell>
                     </TableRow>
                   );
                 })}

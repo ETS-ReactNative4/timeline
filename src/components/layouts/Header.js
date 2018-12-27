@@ -335,19 +335,7 @@ class Header extends React.Component {
             })
           : [];
 
-        /*     const tarefasFiltradas = data.timeline
-          ? data.timeline.filter(el => {
-              if ([5, 6].includes(el.tipo_envolvimento_id)) {
-                return el;
-              }
-            })
-          : [];*/
-
-        console.log(eventosFiltrado);
-
         this.setState({ eventos: eventosFiltrado });
-
-        /* this.setState({ tarefas: tarefasFiltradas });*/
       })
       .then(this.getDashboardData(empresa))
 

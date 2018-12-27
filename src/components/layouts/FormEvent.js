@@ -55,7 +55,7 @@ const styles = theme => ({
     position: 'relative'
   },
   sessaoTitulo: {
-    marginTop: theme.spacing.unit * 6
+    marginTop: theme.spacing.unit
   },
   buttons: {
     display: 'flex',

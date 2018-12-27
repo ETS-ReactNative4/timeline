@@ -46,9 +46,9 @@ function getSorting(order, orderBy) {
 }
 
 const rows = [
-  { id: 'nome', numeric: false, disablePadding: true, label: 'Nome' },
-  { id: 'prefixo', numeric: false, disablePadding: false, label: 'Prefixo' },
-  { id: 'envolvimento', numeric: false, disablePadding: false, label: 'Tipo' }
+  { id: 'nome', disablePadding: true, label: 'Nome' },
+  { id: 'prefixo', disablePadding: false, label: 'Prefixo' },
+  { id: 'envolvimento', disablePadding: false, label: 'Tipo' }
 ];
 
 class EnhancedTableHead extends React.Component {
