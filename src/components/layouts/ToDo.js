@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
+import moment from 'moment';
 import {
   Typography,
   Paper,
@@ -20,7 +21,8 @@ import Divider from '@material-ui/core/Divider';
 
 const styles = theme => ({
   paper: { padding: theme.spacing.unit * 2 },
-  tracado: { textDecorationLine: 'line-through' }
+  tracado: { textDecorationLine: 'line-through' },
+  root: { position: 'relative', overflow: 'auto', maxHeight: 300 }
 });
 
 class ToDo extends React.Component {
@@ -31,7 +33,6 @@ class ToDo extends React.Component {
     this.getEventos = this.getEventos.bind(this);
 
     this.state = {
-      ...props,
       tarefa: '',
       tarefas: [],
       tarefasTodas: [],
@@ -39,9 +40,10 @@ class ToDo extends React.Component {
     };
   }
 
-  componentWillMount() {
-    const { empresa } = this.props;
-    this.getEventos(empresa);
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.empresa !== this.props.empresa) {
+      this.getEventos(this.props.empresa);
+    }
   }
 
   handleChange = input => e => {
@@ -51,28 +53,16 @@ class ToDo extends React.Component {
   handleToggle = input => e => {
     let tarefa = input;
 
-    tarefa.concluida = !tarefa.concluida;
-    if (!tarefa.concluida) {
+    if (tarefa.dt_delete) {
       delete tarefa.dt_delete;
     } else {
       tarefa.dt_delete = new Date();
     }
-
-    /* this.handleCommentEdit(tarefa.id, !tarefa.concluida);*/
-
     this.editaEvento(tarefa);
   };
 
-  /*handleCommentEdit = (key, checked) => {
-    this.setState({
-      tarefas: this.state.tarefas.map(el =>
-        el.id === key ? Object.assign({}, el  )
-    });
-  };*/
-
   handleChangeLista = name => event => {
-    const { tarefasTodas, tarefas } = this.state;
-
+    const { tarefasTodas } = this.state;
     this.setState({ [name]: event.target.checked });
     this.setState({
       tarefas: this.getVisibleTodos(tarefasTodas, event.target.checked)
@@ -80,13 +70,21 @@ class ToDo extends React.Component {
   };
 
   addItem = e => {
-    let { empresa, user } = this.props;
-    if (this.state.tarefa == '') {
+    if (this.state.tarefa === '') {
       return;
     }
+    this.enviaEvento(this.criaTarefa());
+    this.setState({
+      tarefa: ''
+    });
+    e.preventDefault();
+  };
+
+  criaTarefa = () => {
+    let { empresa, user } = this.props;
+    empresa.tipo_envolvimento_id = 1;
     let tarefa = {
       descricao: this.state.tarefa,
-      id: Date.now(),
       dt_evento: new Date(),
       tipo_envolvimento_id: 5,
       status: 3,
@@ -95,7 +93,7 @@ class ToDo extends React.Component {
           id: 1,
           nome: user.NM_FUN,
           chave: user.CD_USU,
-          envolvimento: 1,
+          tipo_envolvimento_id: 1,
           prefixo: user.CD_PRF_DEPE_ATU
         }
       ],
@@ -103,54 +101,49 @@ class ToDo extends React.Component {
         {
           nome: user.NM_PSC_RDZ,
           uor: user.CD_UOR_PSC,
-          envolvimentoDependencia: 1,
+          tipo_envolvimento_id: 1,
           prefixo: user.CD_PRF_DEPE_ATU
         }
-      ]
+      ],
+      empresas: [empresa]
     };
-    this.setState({
-      tarefas: [...this.state.tarefas, tarefa]
-    });
-    this.setState({
-      tarefa: ''
-    });
 
-    this.enviaEvento(tarefa);
-    e.preventDefault();
+    return tarefa;
   };
 
-  enviaEvento(tarefa) {
-    let { empresa, user } = this.props;
-
-    empresa.envolvimentoEmpresa = 1;
-    tarefa.empresas = [empresa];
-    tarefa.funcionarios = [
-      {
-        id: 1,
-        nome: user.NM_FUN,
-        chave: user.CD_USU,
-        envolvimento: 1,
-        prefixo: user.CD_PRF_DEPE_ATU
-      }
-    ];
-
-    const data = { evento: tarefa };
+  enviaEvento = () => {
+    let { empresa } = this.props;
+    const tarefa = this.criaTarefa();
 
     fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
       method: 'POST',
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        evento: tarefa,
+        empresa: this.props.empresa,
+        tipoEvento: '[5,6]'
+      }),
       headers: {
         'x-access-token': window.sessionStorage.token,
         Accept: 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
       }
     })
-      .then(response => console.log(response.json()))
-      .then(this.getEventos(empresa))
+      .then(response => response.json())
+      .then(data => {
+        const tarefasFiltradas = data.timeline;
+
+        this.setState({
+          tarefas: this.getVisibleTodos(tarefasFiltradas, this.state.checkedB)
+        });
+
+        this.setState({
+          tarefasTodas: tarefasFiltradas
+        });
+      })
       .catch(function(err) {
         console.error(err);
       });
-  }
+  };
 
   getEventos = empresa => {
     fetch('https://uce.intranet.bb.com.br/api-timeline/v1/eventos/empresa', {
@@ -195,14 +188,13 @@ class ToDo extends React.Component {
     }
   };
   editaEvento(tarefa) {
-    let { empresa } = this.props;
-    empresa.envolvimentoEmpresa = 1;
-    tarefa.empresas = [empresa];
-    const data = { evento: tarefa };
-
     fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
       method: 'PUT',
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        evento: tarefa,
+        empresa: this.props.empresa,
+        tipoEvento: '[5,6]'
+      }),
       headers: {
         'x-access-token': window.sessionStorage.token,
         Accept: 'application/json, text/plain, */*',
@@ -210,16 +202,25 @@ class ToDo extends React.Component {
       }
     })
       .then(response => response.json())
-      .then(this.getEventos(empresa))
+      .then(response => {
+        const tarefasFiltradas = response.timeline;
+
+        this.setState({
+          tarefas: this.getVisibleTodos(tarefasFiltradas, this.state.checkedB)
+        });
+
+        this.setState({
+          tarefasTodas: tarefasFiltradas
+        });
+      })
       .catch(function(err) {
         console.error(err);
       });
   }
 
   render() {
-    const { tarefas } = this.state;
+    const { tarefas, tarefa } = this.state;
     const { classes } = this.props;
-    const { tarefa, checkedB } = this.state;
 
     return (
       <div>
@@ -250,13 +251,20 @@ class ToDo extends React.Component {
                 }
                 label="Exibe concluídas"
               />
-              <List dense>
-                {tarefas.map(tarefa => (
+              <List dense className={classes.root}>
+                {tarefas.map((tarefa, index) => (
                   <ListItem key={tarefa.id} button>
                     <ListItemText
                       primary={tarefa.descricao}
-                      className={
-                        tarefa.dt_delete ? classes.tracado : classes.naoTracado
+                      secondary={
+                        tarefa.dt_delete
+                          ? 'Concluído: ' +
+                            moment(tarefa.dt_delete)
+                              .locale('pt-BR')
+                              .format('DD/MM/YYYY')
+                          : moment(tarefa.dt_create)
+                              .locale('pt-BR')
+                              .format('DD/MM/YYYY')
                       }
                     />
                     <ListItemSecondaryAction>

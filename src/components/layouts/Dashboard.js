@@ -1,7 +1,7 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import Typography from '@material-ui/core/Typography';
 import PropTypes from 'prop-types';
-import { Grid, Card, CardHeader } from '@material-ui/core';
+import { Grid, Card } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = theme => ({
@@ -26,12 +26,6 @@ const styles = theme => ({
 });
 
 class Dashboard extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
-  componentWillMount() {}
-
   render() {
     const { classes, empresa, dados } = this.props;
 

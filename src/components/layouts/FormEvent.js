@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
@@ -145,22 +145,22 @@ class FormEvent extends React.Component {
     let formIsValid = true;
     console.log(nome, telefone, email, envolvimento);
 
-    if (!nome || nome == '') {
+    if (!nome || nome === '') {
       formIsValid = false;
       errors['nome'] = 'Não pode estar vazio';
     }
 
-    if (!telefone || telefone == '') {
+    if (!telefone || telefone === '') {
       formIsValid = false;
       errors['telefone'] = 'Não pode estar vazio';
     }
 
-    if (!email || email == '') {
+    if (!email || email === '') {
       formIsValid = false;
       errors['email'] = 'Não pode estar vazio';
     }
 
-    if (!envolvimento || envolvimento == '') {
+    if (!envolvimento || envolvimento === '') {
       formIsValid = false;
       errors['envolvimento'] = 'Não pode estar vazio';
     }

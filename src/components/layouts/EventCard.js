@@ -137,7 +137,7 @@ class EventCard extends React.Component {
         <Grid item className={classes.card}>
           <Card>
             <div className={classes.tipoEvento}>
-              {evento.tipo_envolvimento_id == 1 ? (
+              {evento.tipo_envolvimento_id === 1 ? (
                 <div className={classes.tipoEventoColor1}>
                   <Typography
                     variant="caption"

@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import Grid from '@material-ui/core/Grid';
 import { withStyles } from '@material-ui/core/styles';
 import EventCard from './EventCard';
-import { Typography, Card, CardHeader } from '@material-ui/core';
+import { Typography, Card } from '@material-ui/core';
 import red from '@material-ui/core/colors/red';
 import Dashboard from './Dashboard';
 import ToDo from './ToDo';
@@ -23,8 +23,6 @@ const styles = theme => ({
 
 class CardGrid extends React.Component {
   render() {
-    console.log(this.props);
-
     const {
       classes,
       eventos,

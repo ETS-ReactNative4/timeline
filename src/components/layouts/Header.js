@@ -4,7 +4,7 @@ import Toolbar from '@material-ui/core/Toolbar';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import { Route, Link } from 'react-router-dom';
+import { Route } from 'react-router-dom';
 import FormEvent from './FormEvent';
 import Busca from './busca/Busca';
 import FormControl from '@material-ui/core/FormControl';
@@ -64,7 +64,6 @@ class Header extends React.Component {
     super(props);
 
     this.state = {
-      value: 0,
       open: false,
       visao: 1,
       url: 'https://uce.intranet.bb.com.br/api-timeline/v1/empresas/',
@@ -75,7 +74,7 @@ class Header extends React.Component {
         ? JSON.parse(window.sessionStorage.objetoBusca)
         : {},
       descricao: '',
-      currentLocale: 'pt-br',
+
       dt_evento: new Date(),
       funcionario: {},
       funcionarios: [],
@@ -117,7 +116,9 @@ class Header extends React.Component {
       });
     }
 
-    this.getEventos(empresa);
+    if (JSON.stringify(empresa) !== '{}') {
+      this.getEventos(empresa);
+    }
   }
 
   handleParams(params) {
@@ -169,11 +170,9 @@ class Header extends React.Component {
   myCallbackBusca = empresaChild => {
     salvarUltimaPesaquisaCache(1, empresaChild);
     this.setState({ empresa: empresaChild });
-
-    this.getEventos(empresaChild);
-  };
-  handleChangeTab = (event, value) => {
-    this.setState({ value: value });
+    if (empresaChild !== {}) {
+      this.getEventos(empresaChild);
+    }
   };
 
   myCallbackOpenDialog = open => {
@@ -214,7 +213,7 @@ class Header extends React.Component {
         const { empresas } = this.state;
         this.setState({
           empresas: empresas.filter(item => {
-            return item.id != id;
+            return item.id !== id;
           })
         });
 
@@ -223,7 +222,7 @@ class Header extends React.Component {
         const { funcionarios } = this.state;
         this.setState({
           funcionarios: funcionarios.filter(item => {
-            return item.id != id;
+            return item.id !== id;
           })
         });
 
@@ -232,7 +231,7 @@ class Header extends React.Component {
         const { dependencias } = this.state;
         this.setState({
           dependencias: dependencias.filter(item => {
-            return item.id != id;
+            return item.id !== id;
           })
         });
 
@@ -359,7 +358,7 @@ class Header extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { value, url, eventos, currentLocale } = this.state;
+    const { url, eventos } = this.state;
     const { user } = this.props;
     const {
       descricao,
@@ -395,7 +394,7 @@ class Header extends React.Component {
         <MuiThemeProvider theme={theme}>
           <AppBar position="static" color="primary">
             <Toolbar>
-              <img style={{ margin: 8 }} src={logo} />
+              <img style={{ margin: 8 }} src={logo} alt="BB" />
               <Typography
                 variant="h6"
                 color="inherit"
