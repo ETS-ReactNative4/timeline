@@ -16,8 +16,9 @@ import purple from '@material-ui/core/colors/purple';
 import ConfirmationDialogRaw from './ConfirmationDialogRaw';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import SimpleExpansionPanel from './cardDetails/cardDetails';
-import { Menu, MenuItem, Divider } from '@material-ui/core';
+import { Menu, MenuItem, Divider, Paper } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
+import { green } from '@material-ui/core/colors';
 
 const styles = theme => ({
   flex: {
@@ -45,6 +46,17 @@ const styles = theme => ({
     margin: '10px 10px 0px 10px',
     padding: 3,
     backgroundColor: amber[700]
+  },
+  tipoEventoColor3: {
+    margin: '10px 10px 0px 10px',
+    padding: 3,
+    backgroundColor: amber[900]
+  },
+
+  tipoEventoColor4: {
+    margin: '10px 10px 0px 10px',
+    padding: 3,
+    backgroundColor: green[600]
   },
 
   tipoEventoColor2: {
@@ -132,11 +144,12 @@ class EventCard extends React.Component {
     const { anchorEl } = this.state;
     const { classes, evento } = this.props;
     const open = Boolean(anchorEl);
+    console.log(evento);
 
     return (
       <Fragment>
         <Grid item className={classes.card}>
-          <Card>
+          <Paper>
             <div className={classes.tipoEvento}>
               {evento.tipo_envolvimento_id === 1 ? (
                 <div className={classes.tipoEventoColor1}>
@@ -154,6 +167,26 @@ class EventCard extends React.Component {
                     className={classes.tipoEventoTitle}
                   >
                     {evento.tipo_envolvimento_descricao}
+                  </Typography>
+                </div>
+              )}
+
+              {evento.status === 1 ? (
+                <div className={classes.tipoEventoColor3}>
+                  <Typography
+                    variant="caption"
+                    className={classes.tipoEventoTitle}
+                  >
+                    {evento.status_descricao}
+                  </Typography>
+                </div>
+              ) : (
+                <div className={classes.tipoEventoColor4}>
+                  <Typography
+                    variant="caption"
+                    className={classes.tipoEventoTitle}
+                  >
+                    {evento.status_descricao}
                   </Typography>
                 </div>
               )}
@@ -243,7 +276,7 @@ class EventCard extends React.Component {
             <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
               <CardContent />
             </Collapse>
-          </Card>
+          </Paper>
         </Grid>
         <Menu
           id="long-menu"

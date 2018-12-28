@@ -14,11 +14,12 @@ const WAIT_INTERVAL = 2000;
 const suggestions = [];
 
 function renderInputComponent(inputProps) {
-  const { classes, inputRef = () => { }, ref, ...other } = inputProps;
-
+  const { errors, classes, inputRef = () => {}, ref, ...other } = inputProps;
 
   return (
     <TextField
+      error={!errors['evento.dependencias'] ? false : true}
+      helperText={errors['evento.dependencias']}
       fullWidth
       InputProps={{
         inputRef: node => {
@@ -26,8 +27,8 @@ function renderInputComponent(inputProps) {
           inputRef(node);
         },
         classes: {
-          input: classes.input,
-        },
+          input: classes.input
+        }
       }}
       {...other}
     />
@@ -43,18 +44,14 @@ function renderSuggestion(suggestion, { query, isHighlighted }) {
       <div>
         {parts.map((part, index) => {
           return part.highlight ? (
-
             <span key={String(index)} style={{ fontWeight: 400 }}>
               {part.text}
-
             </span>
-
-
           ) : (
-              <strong key={String(index)} style={{ fontWeight: 300 }}>
-                {part.text}
-              </strong>
-            );
+            <strong key={String(index)} style={{ fontWeight: 300 }}>
+              {part.text}
+            </strong>
+          );
         })}
       </div>
     </MenuItem>
@@ -62,8 +59,6 @@ function renderSuggestion(suggestion, { query, isHighlighted }) {
 }
 
 function getSuggestions(value) {
-
-
   const inputValue = deburr(value.trim()).toLowerCase();
   const inputLength = inputValue.length;
   let count = 0;
@@ -71,56 +66,53 @@ function getSuggestions(value) {
   return inputLength === 0
     ? []
     : suggestions.filter(suggestion => {
-      const keep =
-        count < 5 && suggestion.nome.slice(0, inputLength).toLowerCase() === inputValue;
+        const keep =
+          count < 5 &&
+          suggestion.nome.slice(0, inputLength).toLowerCase() === inputValue;
 
-      if (keep) {
-        count += 1;
-      }
+        if (keep) {
+          count += 1;
+        }
 
-      return keep;
-    });
+        return keep;
+      });
 }
 
-
 function getSuggestionValue(suggestion) {
-
-  return "";
+  return '';
 }
 
 const styles = theme => ({
   root: {
-
-    flexGrow: 1,
+    flexGrow: 1
   },
   container: {
     position: 'relative',
-    marginTop: theme.spacing.unit*2,
+    marginTop: theme.spacing.unit * 2
   },
   suggestionsContainerOpen: {
     position: 'absolute',
     zIndex: 1,
     marginTop: theme.spacing.unit,
     left: 0,
-    right: 0,
+    right: 0
   },
   suggestion: {
-    display: 'block',
+    display: 'block'
   },
   suggestionsList: {
     margin: 0,
     padding: 0,
-    listStyleType: 'none',
+    listStyleType: 'none'
   },
   divider: {
-    height: theme.spacing.unit * 2,
-  },
+    height: theme.spacing.unit * 2
+  }
 });
 
 class BuscaDependencia extends React.Component {
-
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       value: '',
       popper: '',
@@ -133,70 +125,67 @@ class BuscaDependencia extends React.Component {
     this.timer = null;
   }
 
-
-
-
-  handleSuggestionSelected = (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => {
-
-    this.props.addSuggestion(suggestion)
-
-  }
+  handleSuggestionSelected = (
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+  ) => {
+    this.props.addSuggestion(suggestion);
+  };
   handleSuggestionsFetchRequested = ({ value }) => {
     this.setState({
-      suggestions: getSuggestions(value),
+      suggestions: getSuggestions(value)
     });
   };
 
   handleSuggestionsClearRequested = () => {
-
     this.setState({
-      suggestions: [],
+      suggestions: []
     });
   };
 
-
-  search = event =>{
-    
+  search = event => {
     clearTimeout(this.timer);
     this.setState({ value: event.target.value });
 
     this.timer = setTimeout(this.triggerChange, WAIT_INTERVAL);
-  }
+  };
 
   triggerChange() {
-
     const { value } = this.state;
 
-    const url = new URL("https://uce.intranet.bb.com.br/api-timeline/v1/dependencias/" + value.replace(/\s/g, ''))
+    const url = new URL(
+      'https://uce.intranet.bb.com.br/api-timeline/v1/dependencias/' +
+        value.replace(/\s/g, '')
+    );
     //Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
 
     fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
-        "x-access-token": window.sessionStorage.token,
-        'Accept': 'application/json, text/plain, */*',
+        'x-access-token': window.sessionStorage.token,
+        Accept: 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
       }
     })
       .then(response => response.json())
       .then(data => {
-        this.setState({ suggestions: data.users[0] })
+        this.setState({ suggestions: data.users[0] });
       })
-      .catch(function (err) { console.error(err); });
-
+      .catch(function(err) {
+        console.error(err);
+      });
   }
 
   handleChange = name => (event, { newValue }) => {
     //this.props.addFuncionario(newValue)
 
     this.setState({
-      [name]: newValue,
+      [name]: newValue
     });
-
   };
 
   render() {
-    const { classes } = this.props;
+    const { classes, errors } = this.props;
     const { value } = this.state;
     const autosuggestProps = {
       renderInputComponent,
@@ -206,7 +195,7 @@ class BuscaDependencia extends React.Component {
 
       onSuggestionSelected: this.handleSuggestionSelected,
       getSuggestionValue,
-      renderSuggestion,
+      renderSuggestion
     };
 
     return (
@@ -214,6 +203,7 @@ class BuscaDependencia extends React.Component {
         <Autosuggest
           {...autosuggestProps}
           inputProps={{
+            errors,
             classes,
             placeholder: 'Buscar dependências',
             value: value,
@@ -224,7 +214,7 @@ class BuscaDependencia extends React.Component {
             container: classes.container,
             suggestionsContainerOpen: classes.suggestionsContainerOpen,
             suggestionsList: classes.suggestionsList,
-            suggestion: classes.suggestion,
+            suggestion: classes.suggestion
           }}
           renderSuggestionsContainer={options => (
             <Paper {...options.containerProps} square>
@@ -232,15 +222,13 @@ class BuscaDependencia extends React.Component {
             </Paper>
           )}
         />
-
-
       </div>
     );
   }
 }
 
 BuscaDependencia.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(BuscaDependencia);

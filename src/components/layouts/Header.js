@@ -77,8 +77,9 @@ class Header extends React.Component {
 
       dt_evento: new Date(),
       funcionario: {},
-      funcionarios: [],
       envolvimento: 1,
+      funcionarios: [],
+
       empresas: [],
       envolvimentoEmpresa: 1,
       envolvimentoParticipantesEmpresa: 1,
@@ -96,9 +97,10 @@ class Header extends React.Component {
   setSelectedDate = date => {
     this.setState({ dt_evento: date });
   };
-
+  setParticipantesOutros = () => {
+    /*   this.setState({evento: })*/
+  };
   componentWillMount() {
-    const { user } = this.props;
     this.setState({ visao: window.sessionStorage.visao || 1 });
     let empresa = window.sessionStorage.objetoBusca
       ? JSON.parse(window.sessionStorage.objetoBusca)
@@ -106,14 +108,6 @@ class Header extends React.Component {
     let params = new URLSearchParams(this.props.location.search);
     if (parseInt(params.get('visao'), 10)) {
       empresa = this.handleParams(params);
-    }
-    if (user) {
-      this.myCallback({
-        nome: user.NM_FUN,
-        chave: user.CD_USU,
-        envolvimento: 1,
-        prefixo: user.CD_PRF_DEPE_ATU
-      });
     }
 
     if (JSON.stringify(empresa) !== '{}') {
@@ -180,8 +174,6 @@ class Header extends React.Component {
   };
 
   setEventos = data => {
-    console.log(data);
-
     this.setState({ eventos: data });
   };
 
@@ -196,6 +188,17 @@ class Header extends React.Component {
     this.setState({ funcionarios: [] });
     this.setState({ empresas: [] });
   };
+
+  setFuncionarioCriou = () => {
+    const { user } = this.props;
+    let funcionario = {
+      nome: user.NM_FUN,
+      chave: user.CD_USU,
+      envolvimento: 1,
+      prefixo: user.CD_PRF_DEPE_ATU
+    };
+    this.setFuncionario(funcionario);
+  };
   setEvento = data => {
     this.setState({ id: data.id });
     this.setState({ descricao: data.descricao });
@@ -203,7 +206,6 @@ class Header extends React.Component {
     this.setState({ dt_evento: data.dt_evento });
     this.setState({ tipo_envolvimento_id: data.tipo_envolvimento_id });
     this.setState({ status: data.status });
-
     this.setState({ dependencias: data.dependencias });
     this.setState({ funcionarios: data.funcionarios });
     this.setState({ empresas: data.empresas });
@@ -215,7 +217,7 @@ class Header extends React.Component {
         const { empresas } = this.state;
         this.setState({
           empresas: empresas.filter(item => {
-            return item.id !== id;
+            return item.id !== id[0];
           })
         });
 
@@ -224,7 +226,7 @@ class Header extends React.Component {
         const { funcionarios } = this.state;
         this.setState({
           funcionarios: funcionarios.filter(item => {
-            return item.id !== id;
+            return item.id !== id[0];
           })
         });
 
@@ -233,7 +235,7 @@ class Header extends React.Component {
         const { dependencias } = this.state;
         this.setState({
           dependencias: dependencias.filter(item => {
-            return item.id !== id;
+            return item.id !== id[0];
           })
         });
 
@@ -273,7 +275,7 @@ class Header extends React.Component {
       ]
     });
   };
-  myCallback = funcionariosChild => {
+  setFuncionario = funcionariosChild => {
     this.setState({
       funcionarios: [
         ...this.state.funcionarios,
@@ -336,11 +338,13 @@ class Header extends React.Component {
               }
             })
           : [];
+        console.log(data);
 
         this.setState({ eventos: eventosFiltrado });
+        this.setState({ dados: data.dados[0] });
       })
-      .then(this.getDashboardData(empresa))
 
+      .then()
       .catch(function(err) {
         console.error(err);
       });
@@ -428,7 +432,7 @@ class Header extends React.Component {
             open={this.state.open}
             myCallbackOpenDialog={this.myCallbackOpenDialog}
             myCallbackDependencia={this.myCallbackDependencia}
-            myCallback={this.myCallback}
+            setFuncionario={this.setFuncionario}
             myCallbackEmpresas={this.myCallbackEmpresas}
             deleteItemListbyId={this.deleteItemListbyId}
             setSelectedDate={this.setSelectedDate}
@@ -439,6 +443,9 @@ class Header extends React.Component {
             clearEvento={this.clearEvento}
             handleChange={this.handleChange}
             setEventos={this.setEventos}
+            setFuncionarioCriou={this.setFuncionarioCriou}
+            setParticipantesOutros={this.setParticipantesOutros}
+            getDashboardData={this.getDashboardData}
             evento={evento}
           />
         </MuiThemeProvider>

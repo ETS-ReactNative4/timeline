@@ -15,6 +15,8 @@ import {
   List,
   Switch
 } from '@material-ui/core';
+import CardIcon from './CardIcon';
+import PlaylistAddCheck from '@material-ui/icons/PlaylistAddCheck';
 
 const styles = theme => ({
   paper: { padding: theme.spacing.unit * 2 },
@@ -22,13 +24,12 @@ const styles = theme => ({
   root: {
     position: 'relative',
     overflow: 'auto',
-    maxHeight: 300,
-    minHeight: 300
+    maxHeight: 250,
+    minHeight: 250
   },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between'
-  }
+  divRoot: { marginTop: 15 },
+  header: { textAlign: 'right' },
+  exibeConcluidas: { marginRight: '0' }
 });
 
 class ToDo extends React.Component {
@@ -172,7 +173,7 @@ class ToDo extends React.Component {
       .then(response => response.json())
 
       .then(data => {
-        const tarefasFiltradas = data.timeline;
+        const tarefasFiltradas = data.timeline || [];
 
         this.setState({
           tarefas: this.getVisibleTodos(tarefasFiltradas, this.state.checkedB)
@@ -230,72 +231,76 @@ class ToDo extends React.Component {
 
   render() {
     const { tarefas, tarefa } = this.state;
-    const { classes, title } = this.props;
+    const { classes, title, iconColor } = this.props;
 
     return (
-      <Paper className={classes.paper}>
-        <div className={classes.header}>
-          <Typography variant="subtitle1">{title}</Typography>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={this.state.checkedB}
-                onChange={this.handleChangeLista('checkedB')}
-                value="checkedB"
-                color="primary"
-              />
-            }
-            label="Exibe concluídas"
-          />
-        </div>
-        <Typography variant="h4">{tarefas.length}</Typography>
-
-        <List dense className={classes.root}>
-          {tarefas.map((tarefa, index) => (
-            <ListItem key={tarefa.id} button>
-              <ListItemText
-                primary={tarefa.descricao}
-                secondary={
-                  tarefa.dt_delete
-                    ? 'Concluído: ' +
-                      moment(tarefa.dt_delete)
-                        .locale('pt-BR')
-                        .format('DD/MM/YYYY')
-                    : moment(tarefa.dt_create)
-                        .locale('pt-BR')
-                        .format('DD/MM/YYYY')
-                }
-              />
-              <ListItemSecondaryAction>
-                <Checkbox
-                  onClick={this.handleToggle(tarefa)}
-                  checked={tarefa.dt_delete}
+      <div className={classes.divRoot}>
+        <CardIcon bgColor={iconColor} Icon={PlaylistAddCheck} />
+        <Paper className={classes.paper}>
+          <div className={classes.header}>
+            <Typography variant="subtitle1">{title}</Typography>
+            <Typography variant="h4">{tarefas.length}</Typography>
+            <FormControlLabel
+              className={classes.exibeConcluidas}
+              control={
+                <Switch
+                  checked={this.state.checkedB}
+                  onChange={this.handleChangeLista('checkedB')}
+                  value="checkedB"
+                  color="primary"
                 />
-              </ListItemSecondaryAction>
-            </ListItem>
-          ))}
-        </List>
+              }
+              label="Exibe concluídas"
+            />
+          </div>
 
-        <TextField
-          label="Tarefa"
-          placeholder="Tarefa"
-          multiline
-          className={classes.inputs}
-          margin="normal"
-          fullWidth
-          value={tarefa}
-          onChange={this.handleChange('tarefa')}
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          type="submit"
-          onClick={this.addItem}
-        >
-          Adicionar Tarefa
-        </Button>
-      </Paper>
+          <List dense className={classes.root}>
+            {tarefas.map((tarefa, index) => (
+              <ListItem key={tarefa.id} button>
+                <ListItemText
+                  primary={tarefa.descricao}
+                  secondary={
+                    tarefa.dt_delete
+                      ? 'Concluído: ' +
+                        moment(tarefa.dt_delete)
+                          .locale('pt-BR')
+                          .format('DD/MM/YYYY')
+                      : moment(tarefa.dt_create)
+                          .locale('pt-BR')
+                          .format('DD/MM/YYYY')
+                  }
+                />
+                <ListItemSecondaryAction>
+                  <Checkbox
+                    onClick={this.handleToggle(tarefa)}
+                    checked={tarefa.dt_delete}
+                  />
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+          </List>
+
+          <TextField
+            label="Tarefa"
+            placeholder="Tarefa"
+            multiline
+            className={classes.inputs}
+            margin="normal"
+            fullWidth
+            value={tarefa}
+            onChange={this.handleChange('tarefa')}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            type="submit"
+            onClick={this.addItem}
+          >
+            Adicionar Tarefa
+          </Button>
+        </Paper>
+      </div>
     );
   }
 }

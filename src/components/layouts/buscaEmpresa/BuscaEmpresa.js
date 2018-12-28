@@ -9,23 +9,25 @@ import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 
-const suggestions = [ ];
+const suggestions = [];
 const WAIT_INTERVAL = 1500;
 
 function renderInputComponent(inputProps) {
-  const { classes, inputRef = () => {}, ref, ...other } = inputProps;
+  const { classes, errors, inputRef = () => {}, ref, ...other } = inputProps;
 
   return (
     <TextField
       fullWidth
+      error={!errors['evento.empresas'] ? false : true}
+      helperText={errors['evento.empresas']}
       InputProps={{
         inputRef: node => {
           ref(node);
           inputRef(node);
         },
         classes: {
-          input: classes.input,
-        },
+          input: classes.input
+        }
       }}
       {...other}
     />
@@ -64,7 +66,8 @@ function getSuggestions(value) {
     ? []
     : suggestions.filter(suggestion => {
         const keep =
-          count < 5 && suggestion.nome.slice(0, inputLength).toLowerCase() === inputValue;
+          count < 5 &&
+          suggestion.nome.slice(0, inputLength).toLowerCase() === inputValue;
 
         if (keep) {
           count += 1;
@@ -74,46 +77,41 @@ function getSuggestions(value) {
       });
 }
 
- 
-
-
 function getSuggestionValue(suggestion) {
-  return "";
+  return '';
 }
 
 const styles = theme => ({
   root: {
- 
-    flexGrow: 1,
+    flexGrow: 1
   },
   container: {
     position: 'relative',
-    marginTop: theme.spacing.unit*2,
+    marginTop: theme.spacing.unit * 2
   },
   suggestionsContainerOpen: {
     position: 'absolute',
     zIndex: 1,
     marginTop: theme.spacing.unit,
     left: 0,
-    right: 0,
+    right: 0
   },
   suggestion: {
-    display: 'block',
+    display: 'block'
   },
   suggestionsList: {
     margin: 0,
     padding: 0,
-    listStyleType: 'none',
+    listStyleType: 'none'
   },
   divider: {
-    height: theme.spacing.unit * 2,
-  },
+    height: theme.spacing.unit * 2
+  }
 });
 
 class BuscaEmpresa extends React.Component {
-
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       value: '',
       popper: '',
@@ -127,67 +125,65 @@ class BuscaEmpresa extends React.Component {
     this.timer = null;
   }
 
-
   handleSuggestionsFetchRequested = ({ value }) => {
     this.setState({
-      suggestions: getSuggestions(value),
+      suggestions: getSuggestions(value)
     });
   };
 
   handleSuggestionsClearRequested = () => {
     this.setState({
-      suggestions: [],
+      suggestions: []
     });
   };
-  
-  search = event =>{
-    
+
+  search = event => {
     clearTimeout(this.timer);
     this.setState({ value: event.target.value });
 
     this.timer = setTimeout(this.triggerChange, WAIT_INTERVAL);
-  }
+  };
 
-  
   triggerChange() {
     const { value } = this.state;
 
-    const url = new URL("https://uce.intranet.bb.com.br/api-timeline/v1/empresas/"+value.replace(/\s/g,''))  
+    const url = new URL(
+      'https://uce.intranet.bb.com.br/api-timeline/v1/empresas/' +
+        value.replace(/\s/g, '')
+    );
     //Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
-     
-    fetch(url,
-       { 
-       headers: {   
-        "x-access-token": window.sessionStorage.token ,
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'}
 
-       })
-    .then(response => response.json())
-    .then(data =>  {
-        this.setState({ suggestions: data.users[0]})
-    }) 
-    .catch(function(err) { console.error(err); });
-
+    fetch(url, {
+      headers: {
+        'x-access-token': window.sessionStorage.token,
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        this.setState({ suggestions: data.users[0] });
+      })
+      .catch(function(err) {
+        console.error(err);
+      });
   }
 
   handleChange = name => (event, { newValue }) => {
     this.setState({
-      [name]: newValue,
+      [name]: newValue
     });
- 
   };
-  handleSuggestionSelected  = (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => {
-   
-    
-    this.props.addSuggestion(suggestion)
-    
-  }
+  handleSuggestionSelected = (
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+  ) => {
+    this.props.addSuggestion(suggestion);
+  };
 
   render() {
-    const { classes } = this.props;
-    
-    
+    const { classes, errors } = this.props;
+
     const { value } = this.state;
 
     const autosuggestProps = {
@@ -197,7 +193,7 @@ class BuscaEmpresa extends React.Component {
       onSuggestionsClearRequested: this.handleSuggestionsClearRequested,
       onSuggestionSelected: this.handleSuggestionSelected,
       getSuggestionValue,
-      renderSuggestion,
+      renderSuggestion
     };
 
     return (
@@ -206,6 +202,7 @@ class BuscaEmpresa extends React.Component {
           {...autosuggestProps}
           inputProps={{
             classes,
+            errors,
             placeholder: 'Buscar empresas',
             value: value,
             onKeyUp: this.search,
@@ -215,7 +212,7 @@ class BuscaEmpresa extends React.Component {
             container: classes.container,
             suggestionsContainerOpen: classes.suggestionsContainerOpen,
             suggestionsList: classes.suggestionsList,
-            suggestion: classes.suggestion,
+            suggestion: classes.suggestion
           }}
           renderSuggestionsContainer={options => (
             <Paper {...options.containerProps} square>
@@ -223,15 +220,13 @@ class BuscaEmpresa extends React.Component {
             </Paper>
           )}
         />
-       
-       
       </div>
     );
   }
 }
 
 BuscaEmpresa.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(BuscaEmpresa);

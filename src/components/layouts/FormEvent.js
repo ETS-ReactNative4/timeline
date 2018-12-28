@@ -33,8 +33,7 @@ import MomentUtils from '@date-io/moment';
 
 import { TimePicker } from 'material-ui-pickers';
 import { DatePicker } from 'material-ui-pickers';
-import { Card, CardContent, Grid, Fab } from '@material-ui/core';
-import Divider from '@material-ui/core/Divider';
+import { Fab } from '@material-ui/core';
 
 moment.locale('pt-br');
 
@@ -51,33 +50,34 @@ const theme = createMuiTheme({
 });
 
 const styles = theme => ({
-  appBar: {
-    position: 'relative'
-  },
-  sessaoTitulo: {
-    marginTop: theme.spacing.unit
-  },
-  buttons: {
-    display: 'flex',
-    justifyContent: 'flex-end'
-  },
-  button: {
-    marginTop: theme.spacing.unit * 3,
-    marginLeft: theme.spacing.unit
-  },
-  fab: {
-    position: 'fixed',
-    bottom: theme.spacing.unit * 2,
-    right: theme.spacing.unit * 2
-  },
-  form: {
+  formSection: {
+    paddingTop: theme.spacing.unit * 2,
+    background: 'linear-gradient(#e3f2fd, white, white)',
+
+    paddingLeft: theme.spacing.unit * 2,
+    paddingRight: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 4,
     [theme.breakpoints.up('md')]: {
       marginTop: theme.spacing.unit * 6,
       marginBottom: theme.spacing.unit * 6
     }
   },
+  appBar: {
+    position: 'relative'
+  },
+
+  buttons: {
+    marginTop: theme.spacing.unit * 2
+  },
+
+  fab: {
+    position: 'fixed',
+    bottom: theme.spacing.unit,
+    right: theme.spacing.unit
+  },
+
   inputs: {
-    marginTop: theme.spacing.unit * 2,
+    marginTop: theme.spacing.unit * 5,
     flexGrow: 1
   }
 });
@@ -88,10 +88,11 @@ function Transition(props) {
 
 const envolvimentos = [
   { id: 1, descricao: 'Visitou' },
-  { id: 2, descricao: 'Sem idéia' }
+  { id: 2, descricao: 'Gerente Brasil' }
 ];
 const envolvimentosEmpresa = [
   { id: 1, descricao: 'Matriz Visitada' },
+  { id: 2, descricao: 'Holding' },
   { id: 2, descricao: 'Vínculo Brasil' }
 ];
 const envolvimentosDependencia = [
@@ -109,6 +110,7 @@ class FormEvent extends React.Component {
       email: '',
       envolvimento: '',
       nome: '',
+      empresa: '',
       participantesEmpresa: [],
       errors: {}
     };
@@ -189,37 +191,75 @@ class FormEvent extends React.Component {
     }
   };
 
+  handleValidationForm() {
+    const { evento } = this.props;
+    let errors = {};
+    let formIsValid = true;
+
+    if (!evento.descricao || evento.descricao === '') {
+      formIsValid = false;
+      errors['evento.descricao'] = 'Não pode estar vazio';
+    }
+
+    if (evento.dependencias.leght < 0) {
+      formIsValid = false;
+      errors['evento.dependencias'] = 'Não pode estar vazio';
+    }
+
+    if (evento.empresas.leght < 0) {
+      formIsValid = false;
+      errors['evento.empresas'] = 'Não pode estar vazio';
+    }
+
+    if (evento.funcionarios.leght < 0) {
+      formIsValid = false;
+      errors['evento.funcionarios'] = 'Não pode estar vazio';
+    }
+
+    this.setState({ errors: errors });
+    return formIsValid;
+  }
   enviaForm(event) {
-    event.preventDefault();
     let { evento, empresa } = this.props;
+    event.preventDefault();
+    console.log(this.handleValidationForm());
 
-    fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
-      method: evento.id ? 'PUT' : 'POST',
-      body: JSON.stringify({
-        evento: evento,
-        empresa: empresa,
-        tipoEvento: '[1,2,3,4]'
-      }),
-      headers: {
-        'x-access-token': window.sessionStorage.token,
-        Accept: 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => response.json())
+    if (this.handleValidationForm()) {
+      this.props.setFuncionarioCriou();
+      this.props.setParticipantesOutros(this.state.participantesEmpresa);
 
-      .then(this.props.clearEvento())
-      .then(this.props.myCallbackOpenDialog(false))
-      .then(response => this.props.setEventos(response.timeline))
-      .catch(function(err) {
-        console.error(err);
-      });
+      fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
+        method: evento.id ? 'PUT' : 'POST',
+        body: JSON.stringify({
+          evento: evento,
+          empresa: empresa,
+          tipoEvento: '[1,2,3,4]'
+        }),
+        headers: {
+          'x-access-token': window.sessionStorage.token,
+          Accept: 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(response => {
+          console.log(response.timeline);
+
+          this.props.setEventos(response.timeline);
+        })
+        .then(this.props.getDashboardData(empresa))
+        .then(this.props.myCallbackOpenDialog(false))
+        .then(this.props.clearEvento())
+        .catch(function(err) {
+          console.error(err);
+        });
+    }
   }
 
   render() {
     const locale = localeMap[this.state.currentLocale];
     const {
-      myCallback,
+      setFuncionario,
       myCallbackEmpresas,
       myCallbackDependencia
     } = this.props;
@@ -237,11 +277,14 @@ class FormEvent extends React.Component {
       telefone,
       email,
       envolvimento,
-      participantesEmpresa
+      participantesEmpresa,
+      empresa,
+      errors
     } = this.state;
     const participanteEmpresa = {
       nome,
       telefone,
+      empresa,
       email,
       envolvimento
     };
@@ -250,7 +293,6 @@ class FormEvent extends React.Component {
       <div>
         <MuiThemeProvider theme={theme}>
           <Fab
-            size="small"
             className={classes.fab}
             color="primary"
             onClick={this.handleClickOpen}
@@ -279,287 +321,274 @@ class FormEvent extends React.Component {
               </Toolbar>
             </AppBar>
 
-            <Grid container justify="center" className={classes.form}>
-              <Grid item xs={12} sm={12} md={8}>
-                <Card>
-                  <CardContent>
-                    <form onSubmit={this.enviaForm} method="post">
-                      <div className={classes.inputsTime}>
-                        <Typography
-                          variant="h6"
-                          gutterBottom
-                          className={classes.sessaoTitulo}
+            <div className={classes.formDiv}>
+              <form onSubmit={this.enviaForm}>
+                <div className={classes.formSection}>
+                  <Typography variant="h4" gutterBottom>
+                    {evento.id ? 'Editar Evento' : 'Novo Evento'}
+                  </Typography>
+
+                  <MuiPickersUtilsProvider
+                    utils={MomentUtils}
+                    locale={locale}
+                    moment={moment}
+                  >
+                    <DatePicker
+                      label="Data"
+                      fullWidth
+                      value={evento.dt_evento}
+                      onChange={this.handleDateChange}
+                      className={classes.inputs}
+                    />
+
+                    <TimePicker
+                      label="Hora"
+                      fullWidth
+                      value={evento.dt_evento}
+                      onChange={this.handleDateChange}
+                      className={classes.inputs}
+                    />
+                  </MuiPickersUtilsProvider>
+                  <TextField
+                    label="Assunto/Tema"
+                    placeholder="Descrição"
+                    error={!errors['evento.descricao'] ? false : true}
+                    helperText={errors['evento.descricao']}
+                    className={classes.inputs}
+                    margin="normal"
+                    fullWidth
+                    multiline
+                    value={evento.descricao}
+                    onChange={handleChange('descricao')}
+                  />
+
+                  <FormControl fullWidth className={classes.inputs}>
+                    <InputLabel htmlFor="tipo-evento-simple">
+                      Tipo Evento
+                    </InputLabel>
+                    <Select
+                      value={evento.tipo_envolvimento_id}
+                      onChange={handleChange('tipo_envolvimento_id')}
+                      inputProps={{
+                        name: 'tipo_envolvimento_id',
+                        id: 'tipo-evento-simple'
+                      }}
+                    >
+                      <MenuItem value={1}>Visita</MenuItem>
+                      <MenuItem value={3}>Ligação</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <FormControl fullWidth className={classes.inputs}>
+                    <InputLabel htmlFor="status-simple">Status</InputLabel>
+                    <Select
+                      value={evento.status}
+                      onChange={handleChange('status')}
+                      inputProps={{
+                        name: 'status',
+                        id: 'status-simple'
+                      }}
+                    >
+                      <MenuItem value={1}>Pendente</MenuItem>
+
+                      <MenuItem value={2}>Concluído</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+                <div className={classes.formSection}>
+                  <Typography variant="h5" gutterBottom>
+                    Dependências
+                  </Typography>
+
+                  <FormControl fullWidth className={classes.inputs}>
+                    <InputLabel htmlFor="envolvimento-dependencia">
+                      Envolvimento
+                    </InputLabel>
+                    <Select
+                      value={evento.envolvimentoDependencia}
+                      onChange={handleChange('envolvimentoDependencia')}
+                      inputProps={{
+                        name: 'envolvimentoDependencia',
+                        id: 'envolvimento-dependencia'
+                      }}
+                    >
+                      {envolvimentosDependencia.map(envolvimento => (
+                        <MenuItem
+                          key={envolvimento.descricao}
+                          value={envolvimento.id}
                         >
-                          Evento
-                        </Typography>
-                        <Divider />
-                        <MuiPickersUtilsProvider
-                          utils={MomentUtils}
-                          locale={locale}
-                          moment={moment}
+                          {envolvimento.descricao}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <BuscaDependencia
+                    errors={errors}
+                    addSuggestion={myCallbackDependencia}
+                    className={classes.inputs}
+                  />
+                  <TableDependencia
+                    data={dependencias}
+                    className={classes.inputs}
+                    deleteItemDependenciaListbyId={
+                      deleteItemDependenciaListbyId
+                    }
+                  />
+                </div>
+                <div className={classes.formSection}>
+                  <Typography variant="h5" gutterBottom>
+                    Participantes BB
+                  </Typography>
+
+                  <FormControl fullWidth className={classes.inputs}>
+                    <InputLabel htmlFor="envolvimento-simple">
+                      Envolvimento
+                    </InputLabel>
+                    <Select
+                      value={evento.envolvimento}
+                      onChange={handleChange('envolvimento')}
+                      className={classes.inputs}
+                      inputProps={{
+                        name: 'envolvimento',
+                        id: 'envolvimento-simple'
+                      }}
+                    >
+                      {envolvimentos.map(envolvimento => (
+                        <MenuItem
+                          key={envolvimento.descricao}
+                          value={envolvimento.id}
                         >
-                          <DatePicker
-                            label="Data"
-                            fullWidth
-                            value={evento.dt_evento}
-                            onChange={this.handleDateChange}
-                            className={classes.inputs}
-                          />
+                          {envolvimento.descricao}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <BuscaFunci setFuncionario={setFuncionario} errors={errors} />
+                  <TableFunci
+                    data={funcionarios}
+                    className={classes.inputs}
+                    deleteItemListbyId={deleteItemListbyId}
+                  />
+                </div>
+                <div className={classes.formSection}>
+                  <Typography variant="h5" gutterBottom>
+                    Empresas
+                  </Typography>
 
-                          <TimePicker
-                            label="Hora"
-                            fullWidth
-                            value={evento.dt_evento}
-                            onChange={this.handleDateChange}
-                            className={classes.inputs}
-                          />
-                        </MuiPickersUtilsProvider>
-                      </div>
-                      <TextField
-                        label="Assunto/Tema"
-                        placeholder="Descrição"
-                        multiline
-                        className={classes.inputs}
-                        margin="normal"
-                        fullWidth
-                        value={evento.descricao}
-                        onChange={handleChange('descricao')}
-                      />
-
-                      <FormControl fullWidth className={classes.inputs}>
-                        <InputLabel htmlFor="tipo-evento-simple">
-                          Tipo Evento
-                        </InputLabel>
-                        <Select
-                          value={evento.tipo_envolvimento_id}
-                          onChange={handleChange('tipo_envolvimento_id')}
-                          inputProps={{
-                            name: 'tipo_envolvimento_id',
-                            id: 'tipo-evento-simple'
-                          }}
+                  <FormControl fullWidth className={classes.inputs}>
+                    <InputLabel htmlFor="envolvimento-empresa">
+                      Envolvimento
+                    </InputLabel>
+                    <Select
+                      value={evento.envolvimentoEmpresa}
+                      onChange={handleChange('envolvimentoEmpresa')}
+                      inputProps={{
+                        name: 'envolvimentoEmpresa',
+                        id: 'envolvimento-empresa'
+                      }}
+                    >
+                      {envolvimentosEmpresa.map(envolvimento => (
+                        <MenuItem
+                          key={envolvimento.descricao}
+                          value={envolvimento.id}
                         >
-                          <MenuItem value={1}>Agendamento</MenuItem>
-                          <MenuItem value={2}>Visita</MenuItem>
-                          <MenuItem value={3}>Ligação</MenuItem>
-                          <MenuItem value={4}>Tarefa</MenuItem>
-                        </Select>
-                      </FormControl>
+                          {envolvimento.descricao}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                  <BuscaEmpresa
+                    addSuggestion={myCallbackEmpresas}
+                    errors={errors}
+                  />
+                  <TableEmpresa
+                    data={empresas}
+                    className={classes.inputs}
+                    deleteItemListbyId={deleteItemListbyId}
+                  />
+                </div>
+                <div className={classes.formSection}>
+                  <Typography variant="h5" gutterBottom>
+                    Participantes das Empresas/Outros
+                  </Typography>
 
-                      <FormControl fullWidth className={classes.inputs}>
-                        <InputLabel htmlFor="status-simple">Status</InputLabel>
-                        <Select
-                          value={evento.status}
-                          onChange={handleChange('status')}
-                          inputProps={{
-                            name: 'status',
-                            id: 'status-simple'
-                          }}
-                        >
-                          <MenuItem value={1}>Iniciado</MenuItem>
-                          <MenuItem value={2}>Andamento</MenuItem>
-                          <MenuItem value={3}>Concluído</MenuItem>
-                        </Select>
-                      </FormControl>
+                  <TextField
+                    id="standard-envolvimento"
+                    label="Envolvimento"
+                    fullWidth
+                    error={!errors['envolvimento'] ? false : true}
+                    helperText={errors['envolvimento']}
+                    className={classes.textField}
+                    value={envolvimento}
+                    onChange={this.handleChangeForm('envolvimento')}
+                    margin="normal"
+                  />
 
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        className={classes.sessaoTitulo}
-                      >
-                        Dependências
-                      </Typography>
-                      <Divider />
-                      <FormControl fullWidth className={classes.inputs}>
-                        <InputLabel htmlFor="envolvimento-dependencia">
-                          Envolvimento
-                        </InputLabel>
-                        <Select
-                          value={evento.envolvimentoDependencia}
-                          onChange={handleChange('envolvimentoDependencia')}
-                          inputProps={{
-                            name: 'envolvimentoDependencia',
-                            id: 'envolvimento-dependencia'
-                          }}
-                        >
-                          {envolvimentosDependencia.map(envolvimento => (
-                            <MenuItem
-                              key={envolvimento.descricao}
-                              value={envolvimento.id}
-                            >
-                              {envolvimento.descricao}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      <BuscaDependencia
-                        addSuggestion={myCallbackDependencia}
-                        className={classes.inputs}
-                      />
-                      <TableDependencia
-                        data={dependencias}
-                        className={classes.inputs}
-                        deleteItemDependenciaListbyId={
-                          deleteItemDependenciaListbyId
-                        }
-                      />
+                  <TextField
+                    id="standard-empresa"
+                    label="Empresa"
+                    fullWidth
+                    error={!errors['empresa'] ? false : true}
+                    helperText={errors['empresa']}
+                    className={classes.textField}
+                    value={empresa}
+                    onChange={this.handleChangeForm('empresa')}
+                    margin="normal"
+                  />
+                  <TextField
+                    id="standard-nome"
+                    label="Nome"
+                    fullWidth
+                    error={!errors['nome'] ? false : true}
+                    helperText={errors['nome']}
+                    className={classes.textField}
+                    value={nome}
+                    onChange={this.handleChangeForm('nome')}
+                    margin="normal"
+                  />
 
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        className={classes.sessaoTitulo}
-                      >
-                        Participantes BB
-                      </Typography>
-                      <Divider />
+                  <TextField
+                    id="standard-telefone"
+                    label="Telefone"
+                    fullWidth
+                    error={!errors['telefone'] ? false : true}
+                    helperText={errors['telefone']}
+                    className={classes.textField}
+                    value={telefone}
+                    onChange={this.handleChangeForm('telefone')}
+                    margin="normal"
+                  />
 
-                      <FormControl fullWidth className={classes.inputs}>
-                        <InputLabel htmlFor="envolvimento-simple">
-                          Envolvimento
-                        </InputLabel>
-                        <Select
-                          value={evento.envolvimento}
-                          onChange={handleChange('envolvimento')}
-                          className={classes.inputs}
-                          inputProps={{
-                            name: 'envolvimento',
-                            id: 'envolvimento-simple'
-                          }}
-                        >
-                          {envolvimentos.map(envolvimento => (
-                            <MenuItem
-                              key={envolvimento.descricao}
-                              value={envolvimento.id}
-                            >
-                              {envolvimento.descricao}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      <BuscaFunci addFuncionario={myCallback} />
-                      <TableFunci
-                        data={funcionarios}
-                        className={classes.inputs}
-                        deleteItemListbyId={deleteItemListbyId}
-                      />
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        className={classes.sessaoTitulo}
-                      >
-                        Empresas
-                      </Typography>
-                      <Divider />
+                  <TextField
+                    id="standard-email"
+                    label="Email"
+                    error={!errors['email'] ? false : true}
+                    helperText={errors['email']}
+                    fullWidth
+                    className={classes.textField}
+                    value={email}
+                    onChange={this.handleChangeForm('email')}
+                    margin="normal"
+                  />
+                  <Button fullWidth onClick={this.addParticipante}>
+                    Adicionar participante
+                  </Button>
+                  <TableParticipante data={participantesEmpresa} />
 
-                      <FormControl fullWidth className={classes.inputs}>
-                        <InputLabel htmlFor="envolvimento-empresa">
-                          Envolvimento
-                        </InputLabel>
-                        <Select
-                          value={evento.envolvimentoEmpresa}
-                          onChange={handleChange('envolvimentoEmpresa')}
-                          inputProps={{
-                            name: 'envolvimentoEmpresa',
-                            id: 'envolvimento-empresa'
-                          }}
-                        >
-                          {envolvimentosEmpresa.map(envolvimento => (
-                            <MenuItem
-                              key={envolvimento.descricao}
-                              value={envolvimento.id}
-                            >
-                              {envolvimento.descricao}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                      <BuscaEmpresa addSuggestion={myCallbackEmpresas} />
-                      <TableEmpresa
-                        data={empresas}
-                        className={classes.inputs}
-                        deleteItemListbyId={deleteItemListbyId}
-                      />
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        className={classes.sessaoTitulo}
-                      >
-                        Participantes das Empresas
-                      </Typography>
-                      <Divider />
-
-                      <TextField
-                        id="standard-envolvimento"
-                        label="Envolvimento"
-                        fullWidth
-                        error={
-                          !this.state.errors['envolvimento'] ? false : true
-                        }
-                        helperText={this.state.errors['envolvimento']}
-                        className={classes.textField}
-                        value={envolvimento}
-                        onChange={this.handleChangeForm('envolvimento')}
-                        margin="normal"
-                      />
-
-                      <TextField
-                        id="standard-nome"
-                        label="Nome"
-                        fullWidth
-                        error={!this.state.errors['nome'] ? false : true}
-                        helperText={this.state.errors['nome']}
-                        className={classes.textField}
-                        value={nome}
-                        onChange={this.handleChangeForm('nome')}
-                        margin="normal"
-                      />
-
-                      <TextField
-                        id="standard-telefone"
-                        label="Telefone"
-                        fullWidth
-                        error={!this.state.errors['telefone'] ? false : true}
-                        helperText={this.state.errors['telefone']}
-                        className={classes.textField}
-                        value={telefone}
-                        onChange={this.handleChangeForm('telefone')}
-                        margin="normal"
-                      />
-
-                      <TextField
-                        id="standard-email"
-                        label="Email"
-                        error={!this.state.errors['email'] ? false : true}
-                        helperText={this.state.errors['email']}
-                        fullWidth
-                        className={classes.textField}
-                        value={email}
-                        onChange={this.handleChangeForm('email')}
-                        margin="normal"
-                      />
-                      <Button
-                        fullWidth
-                        className={classes.button}
-                        onClick={this.addParticipante}
-                      >
-                        Adicionar participante
-                      </Button>
-                      <TableParticipante data={participantesEmpresa} />
-
-                      <div className={classes.buttons}>
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          type="submit"
-                          className={classes.button}
-                        >
-                          {evento.id ? 'Editar' : 'Salvar'}
-                        </Button>
-                      </div>
-                    </form>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
+                  <div className={classes.buttons}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      fullWidth
+                      className={classes.button}
+                    >
+                      {evento.id ? 'Editar' : 'Salvar'}
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </Dialog>
         </MuiThemeProvider>
       </div>

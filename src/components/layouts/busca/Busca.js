@@ -8,24 +8,23 @@ import TextField from '@material-ui/core/TextField';
 import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
+import { InputBase } from '@material-ui/core';
 
-const suggestions = [ ];
+const suggestions = [];
 const WAIT_INTERVAL = 1000;
 
 function renderInputComponent(inputProps) {
   const { classes, inputRef = () => {}, ref, ...other } = inputProps;
 
   return (
-    <TextField
+    <InputBase
       fullWidth
+      className={classes.input}
       InputProps={{
         inputRef: node => {
           ref(node);
           inputRef(node);
-        },
-        classes: {
-          input: classes.input,
-        },
+        }
       }}
       {...other}
     />
@@ -64,7 +63,8 @@ function getSuggestions(value) {
     ? []
     : suggestions.filter(suggestion => {
         const keep =
-          count < 5 && suggestion.nome.slice(0, inputLength).toLowerCase() === inputValue;
+          count < 5 &&
+          suggestion.nome.slice(0, inputLength).toLowerCase() === inputValue;
 
         if (keep) {
           count += 1;
@@ -74,52 +74,53 @@ function getSuggestions(value) {
       });
 }
 
- 
 function getSuggestionValue(suggestion) {
-  return "";
+  return '';
 }
 
 const styles = theme => ({
   root: {
- 
-    flexGrow: 1,
+    flexGrow: 1
   },
   container: {
-    position: 'relative',
+    position: 'relative'
   },
   suggestionsContainerOpen: {
     position: 'absolute',
     zIndex: 1,
     marginTop: theme.spacing.unit,
     left: 0,
-    right: 0,
+    right: 0
   },
   suggestion: {
-    display: 'block',
+    display: 'block'
   },
   suggestionsList: {
     margin: 0,
     padding: 0,
-    listStyleType: 'none',
+    listStyleType: 'none'
   },
   divider: {
-    height: theme.spacing.unit * 2,
+    height: theme.spacing.unit * 2
   },
+  input: {
+    fontSize: 26,
+    color: theme.palette.common.white
+  }
 });
 
 class Busca extends React.Component {
-
   constructor(props) {
     super(props);
 
     this.state = {
       value: '',
       popper: '',
-      suggestions: [],
+      suggestions: []
     };
 
     this.triggerChange = this.triggerChange.bind(this);
-  } 
+  }
 
   componentWillMount() {
     this.timer = null;
@@ -127,59 +128,55 @@ class Busca extends React.Component {
 
   handleSuggestionsFetchRequested = ({ value }) => {
     this.setState({
-      suggestions: getSuggestions(value),
+      suggestions: getSuggestions(value)
     });
   };
 
   handleSuggestionsClearRequested = () => {
     this.setState({
-      suggestions: [],
+      suggestions: []
     });
   };
-  
-  
 
-  search = event =>{
-
+  search = event => {
     clearTimeout(this.timer);
     this.setState({ value: event.target.value });
     this.timer = setTimeout(this.triggerChange, WAIT_INTERVAL);
-
-  }
+  };
 
   triggerChange() {
-  
     const { value } = this.state;
 
-    const url = new URL(this.props.url+value.replace(/\s/g,''))  
+    const url = new URL(this.props.url + value.replace(/\s/g, ''));
     //Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
-     
-    fetch(url,
-       { 
-       headers: {   
-        "x-access-token": window.sessionStorage.token ,
-        'Accept': 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'}
 
-       })
-    .then(response => response.json())
-    .then(data =>  {
-        this.setState({ suggestions: data.users[0]})
-    }) 
-    .catch(function(err) { console.error(err); });
+    fetch(url, {
+      headers: {
+        'x-access-token': window.sessionStorage.token,
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        this.setState({ suggestions: data.users[0] });
+      })
+      .catch(function(err) {
+        console.error(err);
+      });
   }
 
   handleChange = name => (event, { newValue }) => {
     this.setState({
-      [name]: newValue,
+      [name]: newValue
     });
- 
   };
-  handleSuggestionSelected  = (event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) => {
-    
-    this.props.addSuggestion(suggestion)
-    
-  }
+  handleSuggestionSelected = (
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+  ) => {
+    this.props.addSuggestion(suggestion);
+  };
 
   render() {
     const { classes } = this.props;
@@ -191,7 +188,7 @@ class Busca extends React.Component {
       onSuggestionsClearRequested: this.handleSuggestionsClearRequested,
       onSuggestionSelected: this.handleSuggestionSelected,
       getSuggestionValue,
-      renderSuggestion,
+      renderSuggestion
     };
 
     return (
@@ -209,7 +206,7 @@ class Busca extends React.Component {
             container: classes.container,
             suggestionsContainerOpen: classes.suggestionsContainerOpen,
             suggestionsList: classes.suggestionsList,
-            suggestion: classes.suggestion,
+            suggestion: classes.suggestion
           }}
           renderSuggestionsContainer={options => (
             <Paper {...options.containerProps} square>
@@ -217,15 +214,13 @@ class Busca extends React.Component {
             </Paper>
           )}
         />
-       
-       
       </div>
     );
   }
 }
 
 Busca.propTypes = {
-  classes: PropTypes.object.isRequired,
+  classes: PropTypes.object.isRequired
 };
 
 export default withStyles(styles)(Busca);

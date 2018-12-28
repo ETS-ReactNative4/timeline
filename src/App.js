@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Header from './components/layouts/Header';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
 
 function getCookie(cname) {
   var name = cname + '=';
@@ -24,7 +24,8 @@ class App extends Component {
     this.autentica = this.autentica.bind(this);
 
     this.state = {
-      user: {}
+      user: {},
+      autenticado: false
     };
   }
   autentica = () => {
@@ -44,6 +45,7 @@ class App extends Component {
         if (response.status > 300) {
           window.location =
             'https://login.intranet.bb.com.br/distAuth/UI/Login?goto=https://uce.intranet.bb.com.br/timeline/';
+          this.setState({ autenticado: false });
         }
 
         if (response.headers.get('x-access-token') != null) {
@@ -53,10 +55,9 @@ class App extends Component {
         return response.json();
       })
       .then(response => {
-        console.log(response.user[0]);
-
         this.setState({ user: response.user[0] });
       })
+      .then(this.setState({ autenticado: true }))
 
       .catch(function(err) {
         console.error(err);
@@ -69,7 +70,20 @@ class App extends Component {
   render() {
     return (
       <Router initialEntries={['/timeline']} initialIndex={0}>
-        <Route render={props => <Header {...props} user={this.state.user} />} />
+        <Route
+          render={props =>
+            this.state.autenticado ? (
+              <Header {...props} user={this.state.user} />
+            ) : (
+              <Redirect
+                to={{
+                  pathname:
+                    'https://login.intranet.bb.com.br/distAuth/UI/Login?goto=https://uce.intranet.bb.com.br/timeline/'
+                }}
+              />
+            )
+          }
+        />
       </Router>
     );
   }
