@@ -1,12 +1,9 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import Card from '@material-ui/core/Card';
 import CardHeader from '@material-ui/core/CardHeader';
 import moment from 'moment';
 import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Collapse from '@material-ui/core/Collapse';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
@@ -15,7 +12,6 @@ import amber from '@material-ui/core/colors/amber';
 import purple from '@material-ui/core/colors/purple';
 import ConfirmationDialogRaw from './ConfirmationDialogRaw';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import SimpleExpansionPanel from './cardDetails/cardDetails';
 import { Menu, MenuItem, Divider, Paper } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import { green } from '@material-ui/core/colors';
@@ -269,13 +265,6 @@ class EventCard extends React.Component {
                   ))
                 : ''}
             </CardContent>
-            <CardActions className={classes.actions} disableActionSpacing>
-              <SimpleExpansionPanel evento={evento} />
-            </CardActions>
-
-            <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
-              <CardContent />
-            </Collapse>
           </Paper>
         </Grid>
         <Menu

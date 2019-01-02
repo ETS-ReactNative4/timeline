@@ -33,7 +33,7 @@ import MomentUtils from '@date-io/moment';
 
 import { TimePicker } from 'material-ui-pickers';
 import { DatePicker } from 'material-ui-pickers';
-import { Fab } from '@material-ui/core';
+import { Fab, Divider } from '@material-ui/core';
 
 moment.locale('pt-br');
 
@@ -52,13 +52,14 @@ const theme = createMuiTheme({
 const styles = theme => ({
   formSection: {
     paddingTop: theme.spacing.unit * 2,
-    background: 'linear-gradient(#e3f2fd, white, white)',
+    /*background: 'linear-gradient(#e3f2fd, white, white)',*/
 
     paddingLeft: theme.spacing.unit * 2,
     paddingRight: theme.spacing.unit * 2,
     paddingBottom: theme.spacing.unit * 4,
     [theme.breakpoints.up('md')]: {
-      marginTop: theme.spacing.unit * 6,
+      margin: theme.spacing.unit * 20,
+      marginTop: theme.spacing.unit * 2,
       marginBottom: theme.spacing.unit * 6
     }
   },
@@ -77,7 +78,7 @@ const styles = theme => ({
   },
 
   inputs: {
-    marginTop: theme.spacing.unit * 5,
+    marginTop: theme.spacing.unit * 4,
     flexGrow: 1
   }
 });
@@ -140,7 +141,7 @@ class FormEvent extends React.Component {
   };
 
   handleValidation() {
-    const { nome, telefone, email, envolvimento } = this.state;
+    const { nome, telefone, email, envolvimento, empresa } = this.state;
     let errors = {};
     let formIsValid = true;
 
@@ -169,7 +170,7 @@ class FormEvent extends React.Component {
   }
 
   addParticipante = event => {
-    const { nome, telefone, email, envolvimento } = this.state;
+    const { nome, telefone, email, envolvimento, empresa } = this.state;
     event.preventDefault();
     if (this.handleValidation()) {
       this.setState({
@@ -179,11 +180,13 @@ class FormEvent extends React.Component {
             nome: nome,
             telefone: telefone,
             email: email,
+            empresa: empresa,
             envolvimento: envolvimento
           }
         ]
       });
 
+      this.setState({ empresa: '' });
       this.setState({ nome: '' });
       this.setState({ telefone: '' });
       this.setState({ email: '' });
@@ -196,22 +199,24 @@ class FormEvent extends React.Component {
     let errors = {};
     let formIsValid = true;
 
-    if (!evento.descricao || evento.descricao === '') {
+    if (evento.descricao === '') {
       formIsValid = false;
       errors['evento.descricao'] = 'Não pode estar vazio';
     }
 
-    if (evento.dependencias.leght < 0) {
+    console.log(evento.dependencias.length < 1);
+
+    if (evento.dependencias.length < 1) {
       formIsValid = false;
       errors['evento.dependencias'] = 'Não pode estar vazio';
     }
 
-    if (evento.empresas.leght < 0) {
+    if (evento.empresas.length < 1) {
       formIsValid = false;
       errors['evento.empresas'] = 'Não pode estar vazio';
     }
 
-    if (evento.funcionarios.leght < 0) {
+    if (evento.funcionarios.length < 1) {
       formIsValid = false;
       errors['evento.funcionarios'] = 'Não pode estar vazio';
     }
@@ -324,10 +329,6 @@ class FormEvent extends React.Component {
             <div className={classes.formDiv}>
               <form onSubmit={this.enviaForm}>
                 <div className={classes.formSection}>
-                  <Typography variant="h4" gutterBottom>
-                    {evento.id ? 'Editar Evento' : 'Novo Evento'}
-                  </Typography>
-
                   <MuiPickersUtilsProvider
                     utils={MomentUtils}
                     locale={locale}
@@ -350,6 +351,9 @@ class FormEvent extends React.Component {
                     />
                   </MuiPickersUtilsProvider>
                   <TextField
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                     label="Assunto/Tema"
                     placeholder="Descrição"
                     error={!errors['evento.descricao'] ? false : true}
@@ -399,7 +403,7 @@ class FormEvent extends React.Component {
                   <Typography variant="h5" gutterBottom>
                     Dependências
                   </Typography>
-
+                  <Divider />
                   <FormControl fullWidth className={classes.inputs}>
                     <InputLabel htmlFor="envolvimento-dependencia">
                       Envolvimento
@@ -439,7 +443,7 @@ class FormEvent extends React.Component {
                   <Typography variant="h5" gutterBottom>
                     Participantes BB
                   </Typography>
-
+                  <Divider />
                   <FormControl fullWidth className={classes.inputs}>
                     <InputLabel htmlFor="envolvimento-simple">
                       Envolvimento
@@ -474,7 +478,7 @@ class FormEvent extends React.Component {
                   <Typography variant="h5" gutterBottom>
                     Empresas
                   </Typography>
-
+                  <Divider />
                   <FormControl fullWidth className={classes.inputs}>
                     <InputLabel htmlFor="envolvimento-empresa">
                       Envolvimento
@@ -511,8 +515,12 @@ class FormEvent extends React.Component {
                   <Typography variant="h5" gutterBottom>
                     Participantes das Empresas/Outros
                   </Typography>
-
+                  <Divider />
                   <TextField
+                    InputLabelProps={{
+                      shrink: true
+                    }}
+                    placeholder="Sócio, Diretor, Gerente, etc..."
                     id="standard-envolvimento"
                     label="Envolvimento"
                     fullWidth
@@ -525,6 +533,9 @@ class FormEvent extends React.Component {
                   />
 
                   <TextField
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                     id="standard-empresa"
                     label="Empresa"
                     fullWidth
@@ -536,6 +547,9 @@ class FormEvent extends React.Component {
                     margin="normal"
                   />
                   <TextField
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                     id="standard-nome"
                     label="Nome"
                     fullWidth
@@ -548,8 +562,12 @@ class FormEvent extends React.Component {
                   />
 
                   <TextField
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                     id="standard-telefone"
                     label="Telefone"
+                    placeholder="+55 555-555-55555"
                     fullWidth
                     error={!errors['telefone'] ? false : true}
                     helperText={errors['telefone']}
@@ -560,8 +578,12 @@ class FormEvent extends React.Component {
                   />
 
                   <TextField
+                    InputLabelProps={{
+                      shrink: true
+                    }}
                     id="standard-email"
                     label="Email"
+                    placeholder="exemple@exemple.com"
                     error={!errors['email'] ? false : true}
                     helperText={errors['email']}
                     fullWidth
