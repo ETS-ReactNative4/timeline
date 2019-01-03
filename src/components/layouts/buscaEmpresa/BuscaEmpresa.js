@@ -20,6 +20,9 @@ function renderInputComponent(inputProps) {
       fullWidth
       error={!errors['evento.empresas'] ? false : true}
       helperText={errors['evento.empresas']}
+      InputLabelProps={{
+        shrink: true
+      }}
       InputProps={{
         inputRef: node => {
           ref(node);
@@ -201,9 +204,10 @@ class BuscaEmpresa extends React.Component {
         <Autosuggest
           {...autosuggestProps}
           inputProps={{
+            label: 'Buscar empresas',
             classes,
             errors,
-            placeholder: 'Buscar empresas',
+            placeholder: 'Buscar por CNPJ, MCI, Nome',
             value: value,
             onKeyUp: this.search,
             onChange: this.handleChange('value')

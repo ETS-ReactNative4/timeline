@@ -21,6 +21,9 @@ function renderInputComponent(inputProps) {
       fullWidth
       error={!errors['evento.empresas'] ? false : true}
       helperText={errors['evento.empresas']}
+      InputLabelProps={{
+        shrink: true
+      }}
       InputProps={{
         inputRef: node => {
           ref(node);
@@ -208,7 +211,8 @@ class BuscaFunci extends React.Component {
           inputProps={{
             classes,
             errors,
-            placeholder: 'Buscar funcionários',
+            label: 'Buscar funcionários',
+            placeholder: 'Buscar por Chave, Nome',
             value: value,
             onKeyUp: this.search,
             onChange: this.handleChange('value')

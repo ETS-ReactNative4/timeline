@@ -116,6 +116,10 @@ class Header extends React.Component {
     }
   };
 
+  setDados = dados => {
+    this.setState({ dados: dados });
+  };
+
   setEventos = data => {
     this.setState({ eventos: data });
   };
@@ -130,7 +134,7 @@ class Header extends React.Component {
       method: 'POST',
       body: JSON.stringify({
         empresa: empresa,
-        tipoEvento: '[1, 2, 3, 4]',
+        tipoEvento: '[1, 2, 3, 4, 7]',
         excluidos: true
       }),
       headers: {
@@ -148,10 +152,10 @@ class Header extends React.Component {
               }
             })
           : [];
-        console.log(data);
 
         this.setState({ eventos: eventosFiltrado });
-        this.setState({ dados: data.dados[0] });
+
+        this.setDados(data.dados[0]);
       })
 
       .catch(function(err) {
@@ -163,7 +167,7 @@ class Header extends React.Component {
     const { classes } = this.props;
     const { url, eventos } = this.state;
     const { user } = this.props;
-    const { empresa, eventoEdita, dados } = this.state;
+    const { empresa, dados } = this.state;
 
     return (
       <div className={classes.root}>
@@ -202,7 +206,9 @@ class Header extends React.Component {
                 eventos={eventos}
                 dados={dados}
                 getEventos={this.getEventos}
+                setEventos={this.setEventos}
                 setEvento={this.setEvento}
+                setDados={this.setDados}
                 user={user}
                 {...props}
               />

@@ -22,7 +22,7 @@ import TableEmpresa from './buscaEmpresa/TableEmpresa';
 import BuscaDependencia from './buscaDependencia/BuscaDependencia';
 import TableDependencia from './buscaDependencia/TableDependencia';
 import TableParticipante from './TableParticipantes';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
 import { MuiPickersUtilsProvider } from 'material-ui-pickers';
 
 // pick utils
@@ -273,7 +273,7 @@ class FormEvent extends React.Component {
         body: JSON.stringify({
           evento: evento,
           empresa: empresa,
-          tipoEvento: '[1,2,3,4]'
+          tipoEvento: '[1,2,3,4,7]'
         }),
         headers: {
           'x-access-token': window.sessionStorage.token,
@@ -290,9 +290,8 @@ class FormEvent extends React.Component {
                 }
               })
             : [];
-
-          this.setState({ eventos: eventosFiltrado });
-          this.setState({ dados: data.dados[0] });
+          this.props.setEventos(eventosFiltrado);
+          this.props.setDados(data.dados[0]);
         })
 
         .then(this.props.myCallbackOpenDialog(false))
@@ -614,7 +613,7 @@ class FormEvent extends React.Component {
                   className={classes.inputs}
                 />
                 <TableDependencia
-                  data={evento.dependencias}
+                  data={evento.dependencias || []}
                   className={classes.inputs}
                   deleteItemListbyId={this.deleteItemListbyId}
                 />
@@ -652,7 +651,7 @@ class FormEvent extends React.Component {
                   errors={errors}
                 />
                 <TableFunci
-                  data={evento.funcionarios}
+                  data={evento.funcionarios || []}
                   className={classes.inputs}
                   deleteItemListbyId={this.deleteItemListbyId}
                 />
@@ -689,7 +688,7 @@ class FormEvent extends React.Component {
                   errors={errors}
                 />
                 <TableEmpresa
-                  data={evento.empresas}
+                  data={evento.empresas || []}
                   className={classes.inputs}
                   deleteItemListbyId={this.deleteItemListbyId}
                 />
@@ -779,7 +778,7 @@ class FormEvent extends React.Component {
                   Adicionar participante
                 </Button>
                 <TableParticipante
-                  data={evento.participantes}
+                  data={evento.participantes || []}
                   deleteItemListbyId={this.deleteItemListbyId}
                 />
 

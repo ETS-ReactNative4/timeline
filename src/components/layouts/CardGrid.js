@@ -83,7 +83,7 @@ class CardGrid extends React.Component {
     const {
       classes,
       eventos,
-
+      setDados,
       setEventos,
       empresa,
       dados,
@@ -112,6 +112,8 @@ class CardGrid extends React.Component {
               empresa={empresa}
               eventoEdit={eventoEdit}
               user={user}
+              setEventos={setEventos}
+              setDados={setDados}
               tipoDialog={tipoDialog}
             />
           ) : (
@@ -150,6 +152,7 @@ class CardGrid extends React.Component {
                 empresa={empresa}
                 evento={evento}
                 setEventos={setEventos}
+                setDados={setDados}
                 key={index}
                 myCallbackOpenDialog={this.myCallbackOpenDialog}
               />

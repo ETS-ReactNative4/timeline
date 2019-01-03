@@ -21,6 +21,9 @@ function renderInputComponent(inputProps) {
       error={!errors['evento.dependencias'] ? false : true}
       helperText={errors['evento.dependencias']}
       fullWidth
+      InputLabelProps={{
+        shrink: true
+      }}
       InputProps={{
         inputRef: node => {
           ref(node);
@@ -205,7 +208,8 @@ class BuscaDependencia extends React.Component {
           inputProps={{
             errors,
             classes,
-            placeholder: 'Buscar dependências',
+            label: 'Buscar dependências',
+            placeholder: 'Buscar por UOR, Prefixo, Nome',
             value: value,
             onKeyUp: this.search,
             onChange: this.handleChange('value')

@@ -98,6 +98,7 @@ class EventCard extends React.Component {
 
   handleOpenDialogExcluir = () => {
     this.setState({ open: !this.state.open });
+    this.handleClose();
   };
 
   handleClose = () => {
@@ -118,7 +119,11 @@ class EventCard extends React.Component {
 
     fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
       method: 'PUT',
-      body: { evento: evento, empresa: empresa, tipoEvento: '[1,2,3,4]' },
+      body: JSON.stringify({
+        evento: evento,
+        empresa: empresa,
+        tipoEvento: '[1,2,3,4,7]'
+      }),
       headers: {
         'x-access-token': window.sessionStorage.token,
         Accept: 'application/json, text/plain, */*',
@@ -128,9 +133,17 @@ class EventCard extends React.Component {
       .then(response => response.json())
 
       .then(data => {
-        this.props.getEventos(empresa);
+        const eventosFiltrado = data.timeline
+          ? data.timeline.filter(el => {
+              if (!el.dt_delete) {
+                return el;
+              }
+            })
+          : [];
+        this.props.setEventos(eventosFiltrado);
+        this.props.setDados(data.dados[0]);
       })
-      .then(this.handleExpandClick())
+      .then(this.handleClose())
       .catch(function(err) {
         console.error(err);
       });
