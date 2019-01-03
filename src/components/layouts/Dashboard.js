@@ -8,7 +8,7 @@ import { DoneAll, PersonAdd, Event, Schedule, Phone } from '@material-ui/icons';
 const styles = theme => ({
   cardCategory: {
     margin: 0,
-    fontSize: '14px',
+    fontSize: '18px',
     padding: '10px'
   },
   cardTitle: {
@@ -33,7 +33,7 @@ class Dashboard extends React.Component {
           <div className={classes.grupo}>
             <CardIcon bgColor="#FF6F00" Icon={Schedule} />
             <Card className={classes.card}>
-              <Typography variant="subtitle1" className={classes.cardCategory}>
+              <Typography className={classes.cardCategory}>
                 Visitas Pendentes
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>
@@ -47,7 +47,7 @@ class Dashboard extends React.Component {
           <div className={classes.grupo}>
             <CardIcon bgColor="#43A047" Icon={DoneAll} />
             <Card className={classes.card}>
-              <Typography variant="subtitle1" className={classes.cardCategory}>
+              <Typography variant="h6" className={classes.cardCategory}>
                 Visitas Concluídas
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>
@@ -62,7 +62,7 @@ class Dashboard extends React.Component {
             <CardIcon bgColor="#6a1b9a" Icon={Phone} />
 
             <Card className={classes.card}>
-              <Typography variant="subtitle1" className={classes.cardCategory}>
+              <Typography variant="h6" className={classes.cardCategory}>
                 Total de Ligações
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>
@@ -75,7 +75,7 @@ class Dashboard extends React.Component {
           <div className={classes.grupo}>
             <CardIcon bgColor="#0D47A1" Icon={Event} />
             <Card className={classes.card}>
-              <Typography variant="subtitle1" className={classes.cardCategory}>
+              <Typography variant="h6" className={classes.cardCategory}>
                 Total de Eventos
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>

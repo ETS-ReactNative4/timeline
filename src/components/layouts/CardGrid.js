@@ -7,7 +7,9 @@ import { Typography, Paper } from '@material-ui/core';
 import red from '@material-ui/core/colors/red';
 import Dashboard from './Dashboard';
 import ToDo from './ToDo';
-
+import FormEvent from './FormEvent';
+import AddIcon from '@material-ui/icons/Add';
+import { Fab } from '@material-ui/core';
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -24,25 +26,97 @@ const styles = theme => ({
     flexGrow: 1,
     color: red[500],
     padding: theme.spacing.unit * 2
+  },
+  fab: {
+    bottom: theme.spacing.unit,
+    right: theme.spacing.unit,
+    zIndex: 9,
+    position: 'fixed',
+
+    [theme.breakpoints.up('md')]: {
+      position: 'absolute',
+      top: 100,
+      right: theme.spacing.unit * 20,
+      marginBottom: -15
+    }
   }
 });
 
 class CardGrid extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: false,
+      eventoEdit: {},
+      tipoDialog: 'newEvent'
+    };
+  }
+
+  handleClickOpen = () => {
+    this.myCallbackOpenDialog(true, 'newEvent');
+  };
+
+  myCallbackOpenDialog = (open, target, evento) => {
+    let eventoNew = {
+      id: undefined,
+      descricao: '',
+      status: 1,
+      tipo_evento_id: 1,
+      dt_evento: new Date(),
+
+      participantes: [],
+      funcionarios: [],
+      dependencias: [],
+      empresas: []
+    };
+    if (target == 'newEvento') {
+      this.state({
+        eventoEdit: eventoNew
+      });
+    } else {
+      this.setState({ eventoEdit: evento });
+    }
+
+    this.setState({ open: open });
+  };
   render() {
     const {
       classes,
       eventos,
-      myCallbackOpenDialog,
-      setEvento,
+
       setEventos,
       empresa,
       dados,
       user
     } = this.props;
-
+    const { open, eventoEdit, tipoDialog } = this.state;
     return (
       <div className={classes.root}>
         <Grid container spacing={8}>
+          <Fab
+            aria-label="Add"
+            variant="extended"
+            className={classes.fab}
+            color="secondary"
+            onClick={this.handleClickOpen}
+          >
+            <AddIcon />
+
+            <Typography color="button">NOVO EVENTO</Typography>
+          </Fab>
+
+          {this.state.open ? (
+            <FormEvent
+              open={open}
+              myCallbackOpenDialog={this.myCallbackOpenDialog}
+              empresa={empresa}
+              eventoEdit={eventoEdit}
+              user={user}
+              tipoDialog={tipoDialog}
+            />
+          ) : (
+            ''
+          )}
           <Grid item xs={12} md={12} lg={12} className={classes.root}>
             <Typography variant="h4">{empresa.nome}</Typography>
             <Typography variant="subtitle1" color="textSecondary">
@@ -77,8 +151,7 @@ class CardGrid extends React.Component {
                 evento={evento}
                 setEventos={setEventos}
                 key={index}
-                myCallbackOpenDialog={myCallbackOpenDialog}
-                setEvento={setEvento}
+                myCallbackOpenDialog={this.myCallbackOpenDialog}
               />
             ))
           ) : (

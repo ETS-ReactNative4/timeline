@@ -224,7 +224,6 @@ class EnhancedTable extends React.Component {
     this.setState({ selected: [] });
   };
   handleClickDelete = () => {
-    console.log(this.state.selected);
     this.props.deleteItemListbyId(this.state.selected, 'dependencia');
     this.setState({ selected: [] });
   };

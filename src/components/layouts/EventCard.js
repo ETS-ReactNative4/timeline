@@ -105,9 +105,9 @@ class EventCard extends React.Component {
   };
 
   handleOpen = () => {
-    const { evento, setEvento, myCallbackOpenDialog } = this.props;
-    myCallbackOpenDialog(true);
-    setEvento(evento);
+    const { evento, myCallbackOpenDialog } = this.props;
+
+    myCallbackOpenDialog(true, 'editEvent', evento);
   };
 
   excluir = event => {
@@ -140,7 +140,6 @@ class EventCard extends React.Component {
     const { anchorEl } = this.state;
     const { classes, evento } = this.props;
     const open = Boolean(anchorEl);
-    console.log(evento);
 
     return (
       <Fragment>

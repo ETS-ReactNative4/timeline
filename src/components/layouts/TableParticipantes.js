@@ -48,10 +48,10 @@ function getSorting(order, orderBy) {
 const rows = [
   { id: 'nome', disablePadding: true, label: 'Nome' },
   {
-    id: 'evolvimento',
+    id: 'envolvimento',
 
     disablePadding: true,
-    label: 'Evolvimento'
+    label: 'Envolvimento'
   },
 
   { id: 'empresa', disablePadding: true, label: 'Empresa' },
@@ -232,8 +232,7 @@ class EnhancedTable extends React.Component {
     this.setState({ selected: [] });
   };
   handleClickDelete = () => {
-    console.log(this.state.selected);
-    this.props.deleteItemListbyId(this.state.selected, 'dependencia');
+    this.props.deleteItemListbyId(this.state.selected, 'participantes');
     this.setState({ selected: [] });
   };
   handleClick = (event, id) => {
@@ -269,6 +268,7 @@ class EnhancedTable extends React.Component {
 
   render() {
     const { data, classes } = this.props;
+
     const { order, orderBy, selected, rowsPerPage, page } = this.state;
     const emptyRows =
       rowsPerPage - Math.min(rowsPerPage, data.length - page * rowsPerPage);

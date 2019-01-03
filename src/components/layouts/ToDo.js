@@ -21,6 +21,11 @@ import PlaylistAddCheck from '@material-ui/icons/PlaylistAddCheck';
 const styles = theme => ({
   paper: { padding: theme.spacing.unit * 2 },
   tracado: { textDecorationLine: 'line-through' },
+  cardCategory: {
+    margin: 0,
+    fontSize: '18px',
+    paddingBottom: 10
+  },
   root: {
     position: 'relative',
     overflow: 'auto',
@@ -97,7 +102,7 @@ class ToDo extends React.Component {
     let tarefa = {
       descricao: this.state.tarefa,
       dt_evento: new Date(),
-      tipo_envolvimento_id: this.props.tipoEvento,
+      tipo_evento_id: this.props.tipoEvento,
       status: 3,
       funcionarios: [
         {
@@ -238,7 +243,7 @@ class ToDo extends React.Component {
         <CardIcon bgColor={iconColor} Icon={PlaylistAddCheck} />
         <Paper className={classes.paper}>
           <div className={classes.header}>
-            <Typography variant="subtitle1">{title}</Typography>
+            <Typography className={classes.cardCategory}>{title}</Typography>
             <Typography variant="h4">{tarefas.length}</Typography>
             <FormControlLabel
               className={classes.exibeConcluidas}
@@ -297,7 +302,7 @@ class ToDo extends React.Component {
             type="submit"
             onClick={this.addItem}
           >
-            Adicionar Tarefa
+            Adicionar Nova {title}
           </Button>
         </Paper>
       </div>

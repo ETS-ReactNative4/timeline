@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import { Route } from 'react-router-dom';
-import FormEvent from './FormEvent';
+
 import Busca from './busca/Busca';
 import FormControl from '@material-ui/core/FormControl';
 import logo from '../../bancodobrasil.png';
@@ -20,86 +20,33 @@ const theme = createMuiTheme({
     primary: {
       main: '#1565c0',
       dark: '#0d47a1'
+    },
+    secondary: {
+      main: '#FEDA19'
     }
   }
 });
-
-let counterDep = 0;
-function createDependencia(nome, uor, envolvimento, prefixo) {
-  counterDep += 1;
-  return { id: counterDep, nome, uor, envolvimento, prefixo };
-}
-
-let counter = 0;
-function createFuncionario(nome, chave, envolvimento, prefixo) {
-  counter += 1;
-  return { id: counter, nome, chave, envolvimento, prefixo };
-}
-
-let counterEmp = 0;
-function createEmpresa(
-  nome,
-  mci,
-  cod_pais,
-  pais,
-  tabela_origem,
-  bloco_origem,
-  envolvimento
-) {
-  counterEmp += 1;
-  return {
-    id: counterEmp,
-    nome,
-    mci,
-    cod_pais,
-    pais,
-    tabela_origem,
-    bloco_origem,
-    envolvimento
-  };
-}
 
 class Header extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      open: false,
       visao: 1,
       url: 'https://uce.intranet.bb.com.br/api-timeline/v1/empresas/',
       urlEventos:
         'https://uce.intranet.bb.com.br/api-timeline/v1/eventos/empresa/',
-      eventos: [],
+
       empresa: window.sessionStorage.objetoBusca
         ? JSON.parse(window.sessionStorage.objetoBusca)
         : {},
-      descricao: '',
 
-      dt_evento: new Date(),
-      funcionario: {},
-      envolvimento: 1,
-      funcionarios: [],
-
-      empresas: [],
-      envolvimentoEmpresa: 1,
-      envolvimentoParticipantesEmpresa: 1,
-      dependencias: [],
-      envolvimentoDependencia: 1,
-      tipo_envolvimento_id: 1,
-      status: 1,
-      comentario: '',
-      id: undefined,
-
+      eventos: [],
+      eventoEdita: {},
       dados: {}
     };
   }
 
-  setSelectedDate = date => {
-    this.setState({ dt_evento: date });
-  };
-  setParticipantesOutros = () => {
-    /*   this.setState({evento: })*/
-  };
   componentWillMount() {
     this.setState({ visao: window.sessionStorage.visao || 1 });
     let empresa = window.sessionStorage.objetoBusca
@@ -117,14 +64,14 @@ class Header extends React.Component {
 
   handleParams(params) {
     this.handleChangeSelect(1);
-    let empresaParams = createEmpresa(
-      params.get('nome'),
-      parseInt(params.get('mci'), 10),
-      parseInt(params.get('cod_pais'), 10),
-      params.get('pais'),
-      parseInt(params.get('tabela_origem')),
-      parseInt(params.get('bloco_origem'))
-    );
+    let empresaParams = {
+      nome: params.get('nome'),
+      mci: parseInt(params.get('mci'), 10),
+      cod_pais: parseInt(params.get('cod_pais'), 10),
+      pais: params.get('pais'),
+      tabela_origem: parseInt(params.get('tabela_origem')),
+      bloco_origem: parseInt(params.get('bloco_origem'))
+    };
 
     return empresaParams;
   }
@@ -169,145 +116,8 @@ class Header extends React.Component {
     }
   };
 
-  myCallbackOpenDialog = open => {
-    this.setState({ open: open });
-  };
-
   setEventos = data => {
     this.setState({ eventos: data });
-  };
-
-  clearEvento = () => {
-    this.setState({ id: undefined });
-    this.setState({ descricao: '' });
-    this.setState({ dt_create: new Date() });
-    this.setState({ dt_evento: new Date() });
-    this.setState({ tipo_envolvimento_id: 1 });
-    this.setState({ status: 1 });
-    this.setState({ dependencias: [] });
-    this.setState({ funcionarios: [] });
-    this.setState({ empresas: [] });
-  };
-
-  setFuncionarioCriou = () => {
-    const { user } = this.props;
-    let funcionario = {
-      nome: user.NM_FUN,
-      chave: user.CD_USU,
-      envolvimento: 1,
-      prefixo: user.CD_PRF_DEPE_ATU
-    };
-    this.setFuncionario(funcionario);
-  };
-  setEvento = data => {
-    this.setState({ id: data.id });
-    this.setState({ descricao: data.descricao });
-    this.setState({ dt_create: data.dt_create });
-    this.setState({ dt_evento: data.dt_evento });
-    this.setState({ tipo_envolvimento_id: data.tipo_envolvimento_id });
-    this.setState({ status: data.status });
-    this.setState({ dependencias: data.dependencias });
-    this.setState({ funcionarios: data.funcionarios });
-    this.setState({ empresas: data.empresas });
-  };
-
-  deleteItemListbyId = (id, target) => {
-    switch (target) {
-      case 'empresa':
-        const { empresas } = this.state;
-        this.setState({
-          empresas: empresas.filter(item => {
-            return item.id !== id[0];
-          })
-        });
-
-        break;
-      case 'funcionario':
-        const { funcionarios } = this.state;
-        this.setState({
-          funcionarios: funcionarios.filter(item => {
-            return item.id !== id[0];
-          })
-        });
-
-        break;
-      case 'dependencia':
-        const { dependencias } = this.state;
-        this.setState({
-          dependencias: dependencias.filter(item => {
-            return item.id !== id[0];
-          })
-        });
-
-        break;
-
-      default:
-        break;
-    }
-  };
-
-  getDashboardData = empresa => {
-    fetch('https://uce.intranet.bb.com.br/api-timeline/v1/eventos/dashboard', {
-      method: 'POST',
-      body: JSON.stringify({ empresa: empresa }),
-      headers: {
-        'x-access-token': window.sessionStorage.token,
-        Accept: 'application/json, text/plain, */*',
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(response => response.json())
-      .then(data => this.setState({ dados: data.dados[0] }))
-      .catch(function(err) {
-        console.error(err);
-      });
-  };
-  myCallbackDependencia = dependenciaChild => {
-    this.setState({
-      dependencias: [
-        ...this.state.dependencias,
-        createDependencia(
-          dependenciaChild.nome,
-          dependenciaChild.uor,
-          this.state.envolvimentoDependencia,
-          dependenciaChild.prefixo
-        )
-      ]
-    });
-  };
-  setFuncionario = funcionariosChild => {
-    this.setState({
-      funcionarios: [
-        ...this.state.funcionarios,
-        createFuncionario(
-          funcionariosChild.nome,
-          funcionariosChild.chave,
-          this.state.envolvimento,
-          funcionariosChild.prefixo
-        )
-      ]
-    });
-  };
-
-  myCallbackEmpresas = empresaDataChild => {
-    this.setState({
-      empresas: [
-        ...this.state.empresas,
-        createEmpresa(
-          empresaDataChild.nome,
-          empresaDataChild.mci,
-          empresaDataChild.cod_pais,
-          empresaDataChild.pais,
-          empresaDataChild.tabela_origem,
-          empresaDataChild.bloco_origem,
-          this.state.envolvimentoEmpresa
-        )
-      ]
-    });
-  };
-
-  handleChange = input => e => {
-    this.setState({ [input]: e.target.value });
   };
 
   handleChangeInput = event => {
@@ -344,7 +154,6 @@ class Header extends React.Component {
         this.setState({ dados: data.dados[0] });
       })
 
-      .then()
       .catch(function(err) {
         console.error(err);
       });
@@ -354,34 +163,7 @@ class Header extends React.Component {
     const { classes } = this.props;
     const { url, eventos } = this.state;
     const { user } = this.props;
-    const {
-      descricao,
-      tipo_envolvimento_id,
-      status,
-      dt_evento,
-      envolvimento,
-      empresas,
-      envolvimentoEmpresa,
-      dependencias,
-      envolvimentoDependencia,
-      empresa,
-      funcionarios,
-      id,
-      dados
-    } = this.state;
-    const evento = {
-      descricao,
-      tipo_envolvimento_id,
-      status,
-      dt_evento,
-      envolvimento,
-      empresas,
-      envolvimentoEmpresa,
-      dependencias,
-      envolvimentoDependencia,
-      funcionarios,
-      id
-    };
+    const { empresa, eventoEdita, dados } = this.state;
 
     return (
       <div className={classes.root}>
@@ -420,39 +202,18 @@ class Header extends React.Component {
                 eventos={eventos}
                 dados={dados}
                 getEventos={this.getEventos}
-                myCallbackOpenDialog={this.myCallbackOpenDialog}
                 setEvento={this.setEvento}
                 user={user}
                 {...props}
               />
             )}
           />
-
-          <FormEvent
-            open={this.state.open}
-            myCallbackOpenDialog={this.myCallbackOpenDialog}
-            myCallbackDependencia={this.myCallbackDependencia}
-            setFuncionario={this.setFuncionario}
-            myCallbackEmpresas={this.myCallbackEmpresas}
-            deleteItemListbyId={this.deleteItemListbyId}
-            setSelectedDate={this.setSelectedDate}
-            empresa={empresa}
-            empresas={this.state.empresas}
-            funcionarios={this.state.funcionarios}
-            dependencias={this.state.dependencias}
-            clearEvento={this.clearEvento}
-            handleChange={this.handleChange}
-            setEventos={this.setEventos}
-            setFuncionarioCriou={this.setFuncionarioCriou}
-            setParticipantesOutros={this.setParticipantesOutros}
-            getDashboardData={this.getDashboardData}
-            evento={evento}
-          />
         </MuiThemeProvider>
       </div>
     );
   }
 }
+
 function salvarUltimaPesaquisaCache(visao, objeto) {
   window.sessionStorage.visao = visao;
   window.sessionStorage.objetoBusca = JSON.stringify(objeto);

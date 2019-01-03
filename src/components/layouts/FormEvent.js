@@ -41,14 +41,54 @@ const localeMap = {
   en: 'en',
   pt: 'pt-br'
 };
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#1565c0'
-    }
-  }
-});
 
+let counterDep = 0;
+function createDependencia(nome, uor, envolvimento, prefixo) {
+  counterDep += 1;
+  return { id: counterDep, nome, uor, envolvimento, prefixo };
+}
+
+let counter = 0;
+function createFuncionario(nome, chave, envolvimento, prefixo) {
+  counter += 1;
+  return { id: counter, nome, chave, envolvimento, prefixo };
+}
+
+let counterParte = 0;
+function createParte(envolvimento, empresa, nome, telefone, email) {
+  counterParte += 1;
+  return {
+    id: counterParte,
+    envolvimento,
+    empresa,
+    nome,
+    telefone,
+    email
+  };
+}
+
+let counterEmp = 0;
+function createEmpresa(
+  nome,
+  mci,
+  cod_pais,
+  pais,
+  tabela_origem,
+  bloco_origem,
+  envolvimento
+) {
+  counterEmp += 1;
+  return {
+    id: counterEmp,
+    nome,
+    mci,
+    cod_pais,
+    pais,
+    tabela_origem,
+    bloco_origem,
+    envolvimento
+  };
+}
 const styles = theme => ({
   formSection: {
     paddingTop: theme.spacing.unit * 2,
@@ -71,12 +111,6 @@ const styles = theme => ({
     marginTop: theme.spacing.unit * 2
   },
 
-  fab: {
-    position: 'fixed',
-    bottom: theme.spacing.unit,
-    right: theme.spacing.unit
-  },
-
   inputs: {
     marginTop: theme.spacing.unit * 4,
     flexGrow: 1
@@ -94,7 +128,7 @@ const envolvimentos = [
 const envolvimentosEmpresa = [
   { id: 1, descricao: 'Matriz Visitada' },
   { id: 2, descricao: 'Holding' },
-  { id: 2, descricao: 'Vínculo Brasil' }
+  { id: 3, descricao: 'Vínculo Brasil' }
 ];
 const envolvimentosDependencia = [
   { id: 1, descricao: 'Do Cliente' },
@@ -107,95 +141,309 @@ class FormEvent extends React.Component {
 
     this.state = {
       currentLocale: 'pt-br',
-      telefone: '',
-      email: '',
-      envolvimento: '',
-      nome: '',
-      empresa: '',
-      participantesEmpresa: [],
-      errors: {}
-    };
+      evento: {
+        id: undefined,
+        descricao: '',
+        status: 1,
+        tipo_evento_id: 1,
+        dt_evento: new Date(),
 
+        participantes: [],
+        funcionarios: [],
+        dependencias: [],
+        empresas: []
+      },
+      participante: {
+        nome: '',
+        empresa: '',
+        telefone: '',
+        email: '',
+        envolvimento: ''
+      },
+
+      errors: {},
+
+      envolvimentoFuncionario: 1,
+      envolvimentoEmpresa: 1,
+      envolvimentoParticipantesEmpresa: 1,
+      envolvimentoDependencia: 1
+    };
     this.enviaForm = this.enviaForm.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
     this.addParticipante = this.addParticipante.bind(this);
   }
 
-  handleClickOpen = () => {
-    this.props.myCallbackOpenDialog(true);
-  };
+  componentDidMount() {
+    if (this.props.eventoEdit) {
+      this.setState({ evento: this.props.eventoEdit });
+    }
+  }
 
-  handleClose = () => {
-    this.props.myCallbackOpenDialog(false);
+  handleChange = input => e => {
+    this.setState(
+      Object.assign(this.state.evento, { [input]: e.target.value })
+    );
+  };
+  handleChangeParticipante = input => e => {
+    this.setState(
+      Object.assign(this.state.participante, { [input]: e.target.value })
+    );
   };
 
   handleDateChange = date => {
-    this.props.setSelectedDate(date);
-  };
-  handleChange = input => e => {
-    this.props.handleChange(input, e);
+    this.setState(Object.assign(this.state.evento, { dt_evento: date }));
   };
 
-  handleChangeForm = input => e => {
-    this.setState({ [input]: e.target.value });
+  handleClickOpen = () => {
+    this.props.myCallbackOpenDialog(true, 'newEvent');
+  };
+
+  handleClose = () => {
+    this.props.myCallbackOpenDialog(false, 'newEvent');
+  };
+
+  clearEvento = () => {
+    this.setState({
+      evento: {
+        id: undefined,
+        descricao: '',
+        status: 1,
+        tipo_evento_id: 1,
+        dt_evento: new Date(),
+
+        participantes: [],
+        funcionarios: [],
+        dependencias: [],
+        empresas: []
+      }
+    });
   };
 
   handleValidation() {
-    const { nome, telefone, email, envolvimento, empresa } = this.state;
+    const { participante } = this.state;
     let errors = {};
     let formIsValid = true;
 
-    if (!nome || nome === '') {
+    if (!participante.nome || participante.nome === '') {
       formIsValid = false;
-      errors['nome'] = 'Não pode estar vazio';
+      errors['participante.nome'] = 'Não pode estar vazio';
     }
 
-    if (!telefone || telefone === '') {
+    if (!participante.empresa || participante.empresa === '') {
       formIsValid = false;
-      errors['telefone'] = 'Não pode estar vazio';
+      errors['participante.empresa'] = 'Não pode estar vazio';
+    }
+    if (!participante.telefone || participante.telefone === '') {
+      formIsValid = false;
+      errors['participante.telefone'] = 'Não pode estar vazio';
     }
 
-    if (!email || email === '') {
+    if (!participante.email || participante.email === '') {
       formIsValid = false;
-      errors['email'] = 'Não pode estar vazio';
+      errors['participante.email'] = 'Não pode estar vazio';
     }
 
-    if (!envolvimento || envolvimento === '') {
+    if (!participante.envolvimento || participante.envolvimento === '') {
       formIsValid = false;
-      errors['envolvimento'] = 'Não pode estar vazio';
+      errors['participante.envolvimento'] = 'Não pode estar vazio';
     }
 
     this.setState({ errors: errors });
     return formIsValid;
   }
 
-  addParticipante = event => {
-    const { nome, telefone, email, envolvimento, empresa } = this.state;
+  enviaForm = event => {
     event.preventDefault();
-    if (this.handleValidation()) {
+    if (this.handleValidationForm()) {
+      let { evento } = this.state;
+      const { user, empresa } = this.props;
+
+      let funcionario = {
+        nome: user.NM_FUN,
+        chave: user.CD_USU,
+        envolvimento: 99,
+        prefixo: user.CD_PRF_DEPE_ATU
+      };
       this.setState({
-        participantesEmpresa: [
-          ...this.state.participantesEmpresa,
-          {
-            nome: nome,
-            telefone: telefone,
-            email: email,
-            empresa: empresa,
-            envolvimento: envolvimento
-          }
-        ]
+        funcionarios: [...this.state.funcionarios, funcionario]
       });
 
-      this.setState({ empresa: '' });
-      this.setState({ nome: '' });
-      this.setState({ telefone: '' });
-      this.setState({ email: '' });
-      this.setState({ envolvimento: '' });
+      fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
+        method: evento.id ? 'PUT' : 'POST',
+        body: JSON.stringify({
+          evento: evento,
+          empresa: empresa,
+          tipoEvento: '[1,2,3,4]'
+        }),
+        headers: {
+          'x-access-token': window.sessionStorage.token,
+          Accept: 'application/json, text/plain, */*',
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => response.json())
+        .then(data => {
+          const eventosFiltrado = data.timeline
+            ? data.timeline.filter(el => {
+                if (!el.dt_delete) {
+                  return el;
+                }
+              })
+            : [];
+
+          this.setState({ eventos: eventosFiltrado });
+          this.setState({ dados: data.dados[0] });
+        })
+
+        .then(this.props.myCallbackOpenDialog(false))
+        .then(this.clearEvento())
+        .catch(function(err) {
+          console.error(err);
+        });
+    }
+  };
+
+  setDependencia = dependenciaChild => {
+    let dependencias = [
+      ...this.state.evento.dependencias,
+      createDependencia(
+        dependenciaChild.nome,
+        dependenciaChild.uor,
+        this.state.envolvimentoDependencia,
+        dependenciaChild.prefixo
+      )
+    ];
+
+    this.setState(
+      Object.assign(this.state.evento, {
+        dependencias: dependencias
+      })
+    );
+  };
+
+  setFuncionario = funcionariosChild => {
+    let funcionarios = [
+      ...this.state.evento.funcionarios,
+      createFuncionario(
+        funcionariosChild.nome,
+        funcionariosChild.chave,
+        funcionariosChild.envolvimento || this.state.envolvimento,
+        funcionariosChild.prefixo
+      )
+    ];
+
+    this.setState(
+      Object.assign(this.state.evento, {
+        funcionarios: funcionarios
+      })
+    );
+  };
+
+  setEmpresas = empresaDataChild => {
+    let empresas = [
+      ...this.state.evento.empresas,
+      createEmpresa(
+        empresaDataChild.nome,
+        empresaDataChild.mci,
+        empresaDataChild.cod_pais,
+        empresaDataChild.pais,
+        empresaDataChild.tabela_origem,
+        empresaDataChild.bloco_origem,
+        this.state.envolvimentoEmpresa
+      )
+    ];
+
+    this.setState(
+      Object.assign(this.state.evento, {
+        empresas: empresas
+      })
+    );
+  };
+
+  addParticipante = event => {
+    const { participante, evento } = this.state;
+    event.preventDefault();
+
+    if (this.handleValidation()) {
+      let participantes = [
+        ...evento.participantes,
+        createParte(
+          participante.envolvimento,
+          participante.empresa,
+          participante.nome,
+          participante.telefone,
+          participante.email
+        )
+      ];
+
+      this.setState(
+        Object.assign(this.state.evento, {
+          participantes: participantes
+        })
+      );
+
+      this.setState({
+        participante: {
+          nome: '',
+          empresa: '',
+          telefone: '',
+          email: '',
+          tipo_envolvimento_id: ''
+        }
+      });
+    }
+  };
+  deleteItemListbyId = (id, target) => {
+    switch (target) {
+      case 'empresa':
+        this.setState(
+          Object.assign(this.state.evento, {
+            empresas: this.state.evento.empresas.filter(item => {
+              return item.id !== id[0];
+            })
+          })
+        );
+
+        break;
+      case 'funcionario':
+        this.setState(
+          Object.assign(this.state.evento, {
+            funcionarios: this.state.evento.funcionarios.filter(item => {
+              return item.id !== id[0];
+            })
+          })
+        );
+
+        break;
+      case 'dependencia':
+        this.setState(
+          Object.assign(this.state.evento, {
+            dependencias: this.state.evento.dependencias.filter(item => {
+              return item.id !== id[0];
+            })
+          })
+        );
+
+        break;
+
+      case 'participantes':
+        this.setState(
+          Object.assign(this.state.evento, {
+            participantes: this.state.evento.participantes.filter(item => {
+              return item.id !== id[0];
+            })
+          })
+        );
+
+        break;
+
+      default:
+        break;
     }
   };
 
   handleValidationForm() {
-    const { evento } = this.props;
+    const { evento } = this.state;
     let errors = {};
     let formIsValid = true;
 
@@ -203,8 +451,6 @@ class FormEvent extends React.Component {
       formIsValid = false;
       errors['evento.descricao'] = 'Não pode estar vazio';
     }
-
-    console.log(evento.dependencias.length < 1);
 
     if (evento.dependencias.length < 1) {
       formIsValid = false;
@@ -224,395 +470,334 @@ class FormEvent extends React.Component {
     this.setState({ errors: errors });
     return formIsValid;
   }
-  enviaForm(event) {
-    let { evento, empresa } = this.props;
-    event.preventDefault();
-    console.log(this.handleValidationForm());
-
-    if (this.handleValidationForm()) {
-      this.props.setFuncionarioCriou();
-      this.props.setParticipantesOutros(this.state.participantesEmpresa);
-
-      fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
-        method: evento.id ? 'PUT' : 'POST',
-        body: JSON.stringify({
-          evento: evento,
-          empresa: empresa,
-          tipoEvento: '[1,2,3,4]'
-        }),
-        headers: {
-          'x-access-token': window.sessionStorage.token,
-          Accept: 'application/json, text/plain, */*',
-          'Content-Type': 'application/json'
-        }
-      })
-        .then(response => response.json())
-        .then(response => {
-          console.log(response.timeline);
-
-          this.props.setEventos(response.timeline);
-        })
-        .then(this.props.getDashboardData(empresa))
-        .then(this.props.myCallbackOpenDialog(false))
-        .then(this.props.clearEvento())
-        .catch(function(err) {
-          console.error(err);
-        });
-    }
-  }
 
   render() {
     const locale = localeMap[this.state.currentLocale];
-    const {
-      setFuncionario,
-      myCallbackEmpresas,
-      myCallbackDependencia
-    } = this.props;
-    const { funcionarios, empresas, dependencias } = this.props;
+
     const { classes, open } = this.props;
-    const {
-      handleChange,
-      evento,
-      deleteItemDependenciaListbyId,
-      deleteItemListbyId
-    } = this.props;
 
     const {
-      nome,
-      telefone,
-      email,
-      envolvimento,
-      participantesEmpresa,
-      empresa,
-      errors
+      evento,
+      errors,
+      participante,
+      envolvimentoDependencia,
+      envolvimentoFuncionario,
+      envolvimentoEmpresa
     } = this.state;
-    const participanteEmpresa = {
-      nome,
-      telefone,
-      empresa,
-      email,
-      envolvimento
-    };
 
     return (
       <div>
-        <MuiThemeProvider theme={theme}>
-          <Fab
-            className={classes.fab}
-            color="primary"
-            onClick={this.handleClickOpen}
-          >
-            <AddIcon />
-          </Fab>
+        <Dialog
+          fullScreen
+          open={open}
+          onClose={this.handleClose}
+          TransitionComponent={Transition}
+        >
+          <AppBar className={classes.appBar} color="primary">
+            <Toolbar>
+              <IconButton
+                color="inherit"
+                onClick={this.handleClose}
+                aria-label="Close"
+              >
+                <CloseIcon />
+              </IconButton>
+              <Typography variant="h6" color="inherit">
+                {evento ? 'Editar Evento' : 'Novo Evento'}
+              </Typography>
+            </Toolbar>
+          </AppBar>
 
-          <Dialog
-            fullScreen
-            open={open}
-            onClose={this.handleClose}
-            TransitionComponent={Transition}
-          >
-            <AppBar className={classes.appBar} color="primary">
-              <Toolbar>
-                <IconButton
-                  color="inherit"
-                  onClick={this.handleClose}
-                  aria-label="Close"
+          <div className={classes.formDiv}>
+            <form onSubmit={this.enviaForm}>
+              <div className={classes.formSection}>
+                <MuiPickersUtilsProvider
+                  utils={MomentUtils}
+                  locale={locale}
+                  moment={moment}
                 >
-                  <CloseIcon />
-                </IconButton>
-                <Typography variant="h6" color="inherit">
-                  {evento.id ? 'Editar Evento' : 'Novo Evento'}
-                </Typography>
-              </Toolbar>
-            </AppBar>
+                  <DatePicker
+                    label="Data"
+                    fullWidth
+                    value={evento.dt_evento}
+                    onChange={this.handleDateChange}
+                    className={classes.inputs}
+                  />
 
-            <div className={classes.formDiv}>
-              <form onSubmit={this.enviaForm}>
-                <div className={classes.formSection}>
-                  <MuiPickersUtilsProvider
-                    utils={MomentUtils}
-                    locale={locale}
-                    moment={moment}
+                  <TimePicker
+                    label="Hora"
+                    fullWidth
+                    value={evento.dt_evento}
+                    onChange={this.handleDateChange}
+                    className={classes.inputs}
+                  />
+                </MuiPickersUtilsProvider>
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  label="Assunto/Tema"
+                  placeholder="Descrição"
+                  error={!errors['evento.descricao'] ? false : true}
+                  helperText={errors['evento.descricao']}
+                  className={classes.inputs}
+                  margin="normal"
+                  fullWidth
+                  multiline
+                  value={evento['descricao']}
+                  onChange={this.handleChange('descricao')}
+                />
+
+                <FormControl fullWidth className={classes.inputs}>
+                  <InputLabel htmlFor="tipo-evento-simple">
+                    Tipo Evento
+                  </InputLabel>
+                  <Select
+                    value={evento['tipo_evento_id']}
+                    onChange={this.handleChange('tipo_evento_id')}
+                    inputProps={{
+                      name: 'tipo_evento_id',
+                      id: 'tipo-evento-simple'
+                    }}
                   >
-                    <DatePicker
-                      label="Data"
-                      fullWidth
-                      value={evento.dt_evento}
-                      onChange={this.handleDateChange}
-                      className={classes.inputs}
-                    />
+                    <MenuItem value={1}>Visita</MenuItem>
+                    <MenuItem value={3}>Ligação</MenuItem>
+                  </Select>
+                </FormControl>
 
-                    <TimePicker
-                      label="Hora"
-                      fullWidth
-                      value={evento.dt_evento}
-                      onChange={this.handleDateChange}
-                      className={classes.inputs}
-                    />
-                  </MuiPickersUtilsProvider>
-                  <TextField
-                    InputLabelProps={{
-                      shrink: true
+                <FormControl fullWidth className={classes.inputs}>
+                  <InputLabel htmlFor="status-simple">Status</InputLabel>
+                  <Select
+                    value={evento.status}
+                    onChange={this.handleChange('status')}
+                    inputProps={{
+                      name: 'status',
+                      id: 'status-simple'
                     }}
-                    label="Assunto/Tema"
-                    placeholder="Descrição"
-                    error={!errors['evento.descricao'] ? false : true}
-                    helperText={errors['evento.descricao']}
+                  >
+                    <MenuItem value={1}>Pendente</MenuItem>
+
+                    <MenuItem value={2}>Concluído</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+              <div className={classes.formSection}>
+                <Typography variant="h5" gutterBottom>
+                  Dependências
+                </Typography>
+                <Divider />
+                <FormControl fullWidth className={classes.inputs}>
+                  <InputLabel htmlFor="envolvimento-dependencia">
+                    Envolvimento
+                  </InputLabel>
+                  <Select
+                    value={envolvimentoDependencia}
+                    onChange={this.handleChange('envolvimentoDependencia')}
+                    inputProps={{
+                      name: 'envolvimentoDependencia',
+                      id: 'envolvimento-dependencia'
+                    }}
+                  >
+                    {envolvimentosDependencia.map(envolvimento => (
+                      <MenuItem
+                        key={envolvimento.descricao}
+                        value={envolvimento.id}
+                      >
+                        {envolvimento.descricao}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <BuscaDependencia
+                  errors={errors}
+                  addSuggestion={this.setDependencia}
+                  className={classes.inputs}
+                />
+                <TableDependencia
+                  data={evento.dependencias}
+                  className={classes.inputs}
+                  deleteItemListbyId={this.deleteItemListbyId}
+                />
+              </div>
+              <div className={classes.formSection}>
+                <Typography variant="h5" gutterBottom>
+                  Participantes BB
+                </Typography>
+                <Divider />
+                <FormControl fullWidth className={classes.inputs}>
+                  <InputLabel htmlFor="envolvimentoFuncionario-simple">
+                    Envolvimento
+                  </InputLabel>
+                  <Select
+                    value={envolvimentoFuncionario}
+                    onChange={this.handleChange('envolvimentoFuncionario')}
                     className={classes.inputs}
-                    margin="normal"
-                    fullWidth
-                    multiline
-                    value={evento.descricao}
-                    onChange={handleChange('descricao')}
-                  />
-
-                  <FormControl fullWidth className={classes.inputs}>
-                    <InputLabel htmlFor="tipo-evento-simple">
-                      Tipo Evento
-                    </InputLabel>
-                    <Select
-                      value={evento.tipo_envolvimento_id}
-                      onChange={handleChange('tipo_envolvimento_id')}
-                      inputProps={{
-                        name: 'tipo_envolvimento_id',
-                        id: 'tipo-evento-simple'
-                      }}
-                    >
-                      <MenuItem value={1}>Visita</MenuItem>
-                      <MenuItem value={3}>Ligação</MenuItem>
-                    </Select>
-                  </FormControl>
-
-                  <FormControl fullWidth className={classes.inputs}>
-                    <InputLabel htmlFor="status-simple">Status</InputLabel>
-                    <Select
-                      value={evento.status}
-                      onChange={handleChange('status')}
-                      inputProps={{
-                        name: 'status',
-                        id: 'status-simple'
-                      }}
-                    >
-                      <MenuItem value={1}>Pendente</MenuItem>
-
-                      <MenuItem value={2}>Concluído</MenuItem>
-                    </Select>
-                  </FormControl>
-                </div>
-                <div className={classes.formSection}>
-                  <Typography variant="h5" gutterBottom>
-                    Dependências
-                  </Typography>
-                  <Divider />
-                  <FormControl fullWidth className={classes.inputs}>
-                    <InputLabel htmlFor="envolvimento-dependencia">
-                      Envolvimento
-                    </InputLabel>
-                    <Select
-                      value={evento.envolvimentoDependencia}
-                      onChange={handleChange('envolvimentoDependencia')}
-                      inputProps={{
-                        name: 'envolvimentoDependencia',
-                        id: 'envolvimento-dependencia'
-                      }}
-                    >
-                      {envolvimentosDependencia.map(envolvimento => (
-                        <MenuItem
-                          key={envolvimento.descricao}
-                          value={envolvimento.id}
-                        >
-                          {envolvimento.descricao}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <BuscaDependencia
-                    errors={errors}
-                    addSuggestion={myCallbackDependencia}
-                    className={classes.inputs}
-                  />
-                  <TableDependencia
-                    data={dependencias}
-                    className={classes.inputs}
-                    deleteItemDependenciaListbyId={
-                      deleteItemDependenciaListbyId
-                    }
-                  />
-                </div>
-                <div className={classes.formSection}>
-                  <Typography variant="h5" gutterBottom>
-                    Participantes BB
-                  </Typography>
-                  <Divider />
-                  <FormControl fullWidth className={classes.inputs}>
-                    <InputLabel htmlFor="envolvimento-simple">
-                      Envolvimento
-                    </InputLabel>
-                    <Select
-                      value={evento.envolvimento}
-                      onChange={handleChange('envolvimento')}
-                      className={classes.inputs}
-                      inputProps={{
-                        name: 'envolvimento',
-                        id: 'envolvimento-simple'
-                      }}
-                    >
-                      {envolvimentos.map(envolvimento => (
-                        <MenuItem
-                          key={envolvimento.descricao}
-                          value={envolvimento.id}
-                        >
-                          {envolvimento.descricao}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <BuscaFunci setFuncionario={setFuncionario} errors={errors} />
-                  <TableFunci
-                    data={funcionarios}
-                    className={classes.inputs}
-                    deleteItemListbyId={deleteItemListbyId}
-                  />
-                </div>
-                <div className={classes.formSection}>
-                  <Typography variant="h5" gutterBottom>
-                    Empresas
-                  </Typography>
-                  <Divider />
-                  <FormControl fullWidth className={classes.inputs}>
-                    <InputLabel htmlFor="envolvimento-empresa">
-                      Envolvimento
-                    </InputLabel>
-                    <Select
-                      value={evento.envolvimentoEmpresa}
-                      onChange={handleChange('envolvimentoEmpresa')}
-                      inputProps={{
-                        name: 'envolvimentoEmpresa',
-                        id: 'envolvimento-empresa'
-                      }}
-                    >
-                      {envolvimentosEmpresa.map(envolvimento => (
-                        <MenuItem
-                          key={envolvimento.descricao}
-                          value={envolvimento.id}
-                        >
-                          {envolvimento.descricao}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                  <BuscaEmpresa
-                    addSuggestion={myCallbackEmpresas}
-                    errors={errors}
-                  />
-                  <TableEmpresa
-                    data={empresas}
-                    className={classes.inputs}
-                    deleteItemListbyId={deleteItemListbyId}
-                  />
-                </div>
-                <div className={classes.formSection}>
-                  <Typography variant="h5" gutterBottom>
-                    Participantes das Empresas/Outros
-                  </Typography>
-                  <Divider />
-                  <TextField
-                    InputLabelProps={{
-                      shrink: true
+                    inputProps={{
+                      name: 'envolvimentoFuncionario',
+                      id: 'envolvimentoFuncionario-simple'
                     }}
-                    placeholder="Sócio, Diretor, Gerente, etc..."
-                    id="standard-envolvimento"
-                    label="Envolvimento"
-                    fullWidth
-                    error={!errors['envolvimento'] ? false : true}
-                    helperText={errors['envolvimento']}
-                    className={classes.textField}
-                    value={envolvimento}
-                    onChange={this.handleChangeForm('envolvimento')}
-                    margin="normal"
-                  />
+                  >
+                    {envolvimentos.map(envolvimento => (
+                      <MenuItem
+                        key={envolvimento.descricao}
+                        value={envolvimento.id}
+                      >
+                        {envolvimento.descricao}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <BuscaFunci
+                  setFuncionario={this.setFuncionario}
+                  errors={errors}
+                />
+                <TableFunci
+                  data={evento.funcionarios}
+                  className={classes.inputs}
+                  deleteItemListbyId={this.deleteItemListbyId}
+                />
+              </div>
+              <div className={classes.formSection}>
+                <Typography variant="h5" gutterBottom>
+                  Empresas
+                </Typography>
+                <Divider />
+                <FormControl fullWidth className={classes.inputs}>
+                  <InputLabel htmlFor="envolvimento-empresa">
+                    Envolvimento
+                  </InputLabel>
+                  <Select
+                    value={envolvimentoEmpresa}
+                    onChange={this.handleChange('envolvimentoEmpresa')}
+                    inputProps={{
+                      name: 'envolvimentoEmpresa',
+                      id: 'envolvimento-empresa'
+                    }}
+                  >
+                    {envolvimentosEmpresa.map(envolvimento => (
+                      <MenuItem
+                        key={envolvimento.descricao}
+                        value={envolvimento.id}
+                      >
+                        {envolvimento.descricao}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <BuscaEmpresa
+                  addSuggestion={this.setEmpresas}
+                  errors={errors}
+                />
+                <TableEmpresa
+                  data={evento.empresas}
+                  className={classes.inputs}
+                  deleteItemListbyId={this.deleteItemListbyId}
+                />
+              </div>
+              <div className={classes.formSection}>
+                <Typography variant="h5" gutterBottom>
+                  Participantes das Empresas/Outros
+                </Typography>
+                <Divider />
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  placeholder="Sócio, Diretor, Gerente, etc..."
+                  id="standard-envolvimento"
+                  label="Envolvimento"
+                  fullWidth
+                  error={!errors['participante.envolvimento'] ? false : true}
+                  helperText={errors['participante.envolvimento']}
+                  className={classes.textField}
+                  value={participante['envolvimento']}
+                  onChange={this.handleChangeParticipante('envolvimento')}
+                  margin="normal"
+                />
 
-                  <TextField
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    id="standard-empresa"
-                    label="Empresa"
-                    fullWidth
-                    error={!errors['empresa'] ? false : true}
-                    helperText={errors['empresa']}
-                    className={classes.textField}
-                    value={empresa}
-                    onChange={this.handleChangeForm('empresa')}
-                    margin="normal"
-                  />
-                  <TextField
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    id="standard-nome"
-                    label="Nome"
-                    fullWidth
-                    error={!errors['nome'] ? false : true}
-                    helperText={errors['nome']}
-                    className={classes.textField}
-                    value={nome}
-                    onChange={this.handleChangeForm('nome')}
-                    margin="normal"
-                  />
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  id="standard-empresa"
+                  label="Empresa"
+                  fullWidth
+                  error={!errors['participante.empresa'] ? false : true}
+                  helperText={errors['participante.empresa']}
+                  className={classes.textField}
+                  value={participante['empresa']}
+                  onChange={this.handleChangeParticipante('empresa')}
+                  margin="normal"
+                />
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  id="standard-nome"
+                  label="Nome"
+                  fullWidth
+                  error={!errors['participante.nome'] ? false : true}
+                  helperText={errors['participante.nome']}
+                  className={classes.textField}
+                  value={participante['nome']}
+                  onChange={this.handleChangeParticipante('nome')}
+                  margin="normal"
+                />
 
-                  <TextField
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    id="standard-telefone"
-                    label="Telefone"
-                    placeholder="+55 555-555-55555"
-                    fullWidth
-                    error={!errors['telefone'] ? false : true}
-                    helperText={errors['telefone']}
-                    className={classes.textField}
-                    value={telefone}
-                    onChange={this.handleChangeForm('telefone')}
-                    margin="normal"
-                  />
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  id="standard-telefone"
+                  label="Telefone"
+                  placeholder="+55 555-555-55555"
+                  fullWidth
+                  error={!errors['participante.telefone'] ? false : true}
+                  helperText={errors['participante.telefone']}
+                  className={classes.textField}
+                  value={participante['telefone']}
+                  onChange={this.handleChangeParticipante('telefone')}
+                  margin="normal"
+                />
 
-                  <TextField
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    id="standard-email"
-                    label="Email"
-                    placeholder="exemple@exemple.com"
-                    error={!errors['email'] ? false : true}
-                    helperText={errors['email']}
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  id="standard-email"
+                  label="Email"
+                  placeholder="example@example.com"
+                  error={!errors['participante.email'] ? false : true}
+                  helperText={errors['participante.email']}
+                  fullWidth
+                  className={classes.textField}
+                  value={participante['email']}
+                  onChange={this.handleChangeParticipante('email')}
+                  margin="normal"
+                />
+                <Button fullWidth onClick={this.addParticipante}>
+                  Adicionar participante
+                </Button>
+                <TableParticipante
+                  data={evento.participantes}
+                  deleteItemListbyId={this.deleteItemListbyId}
+                />
+
+                <div className={classes.buttons}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    type="submit"
                     fullWidth
-                    className={classes.textField}
-                    value={email}
-                    onChange={this.handleChangeForm('email')}
-                    margin="normal"
-                  />
-                  <Button fullWidth onClick={this.addParticipante}>
-                    Adicionar participante
+                    className={classes.button}
+                  >
+                    {evento.id ? 'Editar' : 'Salvar'}
                   </Button>
-                  <TableParticipante data={participantesEmpresa} />
-
-                  <div className={classes.buttons}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      type="submit"
-                      fullWidth
-                      className={classes.button}
-                    >
-                      {evento.id ? 'Editar' : 'Salvar'}
-                    </Button>
-                  </div>
                 </div>
-              </form>
-            </div>
-          </Dialog>
-        </MuiThemeProvider>
+              </div>
+            </form>
+          </div>
+        </Dialog>
       </div>
     );
   }
