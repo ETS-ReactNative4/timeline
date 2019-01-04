@@ -60,6 +60,7 @@ class CardGrid extends React.Component {
     let eventoNew = {
       id: undefined,
       descricao: '',
+      assunto: '',
       status: 1,
       tipo_evento_id: 1,
       dt_evento: new Date(),
@@ -157,6 +158,7 @@ class CardGrid extends React.Component {
             {eventos.length > 0 ? (
               eventos.map((evento, index) => (
                 <EventCard
+                  user={user}
                   language={language}
                   empresa={empresa}
                   evento={evento}

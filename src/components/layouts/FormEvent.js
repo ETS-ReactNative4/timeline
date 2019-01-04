@@ -33,7 +33,7 @@ import MomentUtils from '@date-io/moment';
 
 import { TimePicker } from 'material-ui-pickers';
 import { DatePicker } from 'material-ui-pickers';
-import { Fab, Divider } from '@material-ui/core';
+import { Divider } from '@material-ui/core';
 
 moment.locale('pt-br');
 
@@ -149,7 +149,7 @@ class FormEvent extends React.Component {
         status: 1,
         tipo_evento_id: 1,
         dt_evento: new Date(),
-
+        assunto: '',
         participantes: [],
         funcionarios: [],
         dependencias: [],
@@ -167,7 +167,7 @@ class FormEvent extends React.Component {
 
       errors: {},
 
-      envolvimentoFuncionario: 1,
+      envolvimentoFuncionario: 2,
       envolvimentoEmpresa: 1,
       envolvimentoParticipantesEmpresa: 1,
       envolvimentoDependencia: 1
@@ -216,7 +216,7 @@ class FormEvent extends React.Component {
         status: 1,
         tipo_evento_id: 1,
         dt_evento: new Date(),
-
+        assunto: '',
         participantes: [],
         funcionarios: [],
         dependencias: [],
@@ -262,9 +262,8 @@ class FormEvent extends React.Component {
     event.preventDefault();
     if (this.handleValidationForm()) {
       let { evento } = this.state;
-      const { user, empresa } = this.props;
       console.log(evento);
-
+      const { user, empresa } = this.props;
       let funcionario = {
         nome: user.NM_FUN,
         chave: user.CD_USU,
@@ -461,6 +460,11 @@ class FormEvent extends React.Component {
       errors['evento.descricao'] = 'Não pode estar vazio';
     }
 
+    if (evento.assunto === '') {
+      formIsValid = false;
+      errors['evento.assunto'] = 'Não pode estar vazio';
+    }
+
     if (evento.dependencias.length < 1) {
       formIsValid = false;
       errors['evento.dependencias'] = 'Não pode estar vazio';
@@ -546,6 +550,21 @@ class FormEvent extends React.Component {
                     shrink: true
                   }}
                   label="Assunto/Tema"
+                  placeholder="Assunto/Tema"
+                  error={!errors['evento.assunto'] ? false : true}
+                  helperText={errors['evento.assunto']}
+                  className={classes.inputs}
+                  margin="normal"
+                  fullWidth
+                  value={evento['assunto']}
+                  onChange={this.handleChange('assunto')}
+                />
+
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  label="Descrição"
                   placeholder="Descrição"
                   error={!errors['evento.descricao'] ? false : true}
                   helperText={errors['evento.descricao']}
@@ -553,6 +572,7 @@ class FormEvent extends React.Component {
                   margin="normal"
                   fullWidth
                   multiline
+                  rows={10}
                   value={evento['descricao']}
                   onChange={this.handleChange('descricao')}
                 />

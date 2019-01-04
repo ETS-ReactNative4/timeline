@@ -7,18 +7,33 @@ import CardContent from '@material-ui/core/CardContent';
 import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import Typography from '@material-ui/core/Typography';
-import blue from '@material-ui/core/colors/blue';
-import amber from '@material-ui/core/colors/amber';
-import purple from '@material-ui/core/colors/purple';
 import ConfirmationDialogRaw from './ConfirmationDialogRaw';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { Menu, MenuItem, Divider, Paper, Hidden } from '@material-ui/core';
+import classnames from 'classnames';
+
+import {
+  Menu,
+  MenuItem,
+  Divider,
+  Paper,
+  Hidden,
+  Collapse,
+  CardActions,
+  TextField,
+  Button
+} from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
-import { green } from '@material-ui/core/colors';
+import { green, blue, amber, purple } from '@material-ui/core/colors';
 import 'moment/locale/pt-br';
-import { Edit } from '@material-ui/icons';
+import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
+
+import CommentCard from './CommentCard';
+import Edit from '@material-ui/icons/Edit';
 const styles = theme => ({
   flex: {
+    display: 'flex'
+  },
+  actions: {
     display: 'flex'
   },
   card: {
@@ -82,6 +97,16 @@ const styles = theme => ({
     width: 25,
     height: 25,
     margin: 5
+  },
+  expand: {
+    transform: 'rotate(0deg)',
+    marginLeft: 'auto',
+    transition: theme.transitions.create('transform', {
+      duration: theme.transitions.duration.shortest
+    })
+  },
+  expandOpen: {
+    transform: 'rotate(180deg)'
   }
 });
 
@@ -90,14 +115,30 @@ class EventCard extends React.Component {
     super(props);
     this.state = {
       anchorEl: null,
-      expanded: false,
-      open: false
+      expanded: true,
+      open: false,
+      newComment: '',
+      comentarios: [],
+      errors: {}
     };
     this.tipoEvento = this.tipoEvento.bind();
     this.excluir = this.excluir.bind();
+    this.handleExpandClick = this.handleExpandClick.bind();
   }
+
+  componentDidMount() {
+    if (this.props.evento.comentarios) {
+      this.setState({ comentarios: this.props.evento.comentarios });
+    }
+  }
+
   handleExpandClick = () => {
     this.setState(state => ({ expanded: !state.expanded }));
+    console.log(this.props.evento);
+
+    if (this.props.evento.comentarios) {
+      this.setState({ comentarios: this.props.evento.comentarios });
+    }
   };
 
   handleClick = event => {
@@ -157,6 +198,41 @@ class EventCard extends React.Component {
       });
   };
 
+  createComment() {
+    const { user, evento } = this.props;
+    const { newComment } = this.state;
+
+    let comentario = {
+      descricao: newComment,
+      eventoId: evento.id,
+      nome: user.NM_FUN,
+      chaveFunci: user.CD_USU,
+      prefixo: user.CD_PRF_DEPE_ATU,
+      dt_create: new Date()
+    };
+    return comentario;
+  }
+  addItem = e => {
+    let errors = {};
+
+    if (this.state.newComment === '') {
+      errors['evento.descricao'] = 'Não pode estar vazio';
+    }
+
+    this.setState({
+      comentarios: [...this.state.comentarios, this.createComment()]
+    });
+    this.enviaComentario();
+    this.setState({
+      newComment: ''
+    });
+
+    this.setState({
+      errors: errors
+    });
+
+    e.preventDefault();
+  };
   tipoEvento(evento, classes) {
     switch (evento.tipo_evento_id) {
       case 1:
@@ -194,8 +270,12 @@ class EventCard extends React.Component {
     }
   }
 
+  handleChange = input => e => {
+    this.setState({ [input]: e.target.value });
+  };
+
   render() {
-    const { anchorEl } = this.state;
+    const { anchorEl, newComment, comentarios, errors } = this.state;
     const { classes, evento, language } = this.props;
     const open = Boolean(anchorEl);
 
@@ -320,6 +400,56 @@ class EventCard extends React.Component {
                   ))
                 : ''}
             </CardContent>
+            <CardActions className={classes.actions} disableActionSpacing>
+              <IconButton
+                className={classnames(classes.expand, {
+                  [classes.expandOpen]: this.state.expanded
+                })}
+                onClick={this.handleExpandClick}
+                aria-expanded={this.state.expanded}
+                aria-label="Show more"
+              >
+                <ExpandMoreIcon />
+              </IconButton>
+            </CardActions>
+            <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
+              <CardContent>
+                <div>
+                  <Typography variant="h6">Comentários</Typography>
+                  <Divider />
+                  {comentarios.map(comentario => (
+                    <CommentCard comentario={comentario} />
+                  ))}
+                </div>
+
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  label="Novo Comentário"
+                  placeholder="Novo Comentário"
+                  error={!errors['evento.descricao'] ? false : true}
+                  helperText={errors['evento.descricao']}
+                  className={classes.inputs}
+                  margin="normal"
+                  fullWidth
+                  multiline
+                  rows={3}
+                  value={newComment}
+                  onChange={this.handleChange('newComment')}
+                />
+
+                <Button
+                  variant="contained"
+                  color="primary"
+                  className={classes.button}
+                  type="submit"
+                  onClick={this.addItem}
+                >
+                  Adicionar Novo Comentário
+                </Button>
+              </CardContent>
+            </Collapse>
           </Paper>
         </Grid>
         <Menu
@@ -344,6 +474,45 @@ class EventCard extends React.Component {
       </Fragment>
     );
   }
+
+  enviaComentario = () => {
+    const { empresa } = this.props;
+    let evento = this.props.evento;
+
+    evento.comentarios = this.state.comentarios;
+    console.log(this.state.comentarios);
+
+    console.log(evento);
+
+    fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
+      method: 'PUT',
+      body: JSON.stringify({
+        evento: evento,
+        empresa: empresa,
+        tipoEvento: '[1, 2, 3, 4, 7, 8, 9]'
+      }),
+      headers: {
+        'x-access-token': window.sessionStorage.token,
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json'
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        const eventosFiltrado = data.timeline
+          ? data.timeline.filter(el => {
+              if (!el.dt_delete) {
+                return el;
+              }
+            })
+          : [];
+        this.props.setEventos(eventosFiltrado);
+        this.props.setDados(data.dados[0]);
+      })
+      .catch(function(err) {
+        console.error(err);
+      });
+  };
 }
 
 EventCard.propTypes = {
