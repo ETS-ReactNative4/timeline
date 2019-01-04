@@ -32,7 +32,7 @@ const styles = theme => ({
     maxHeight: 250,
     minHeight: 250
   },
-  divRoot: { marginTop: 15 },
+  divRoot: { marginTop: 25 },
   header: { textAlign: 'right' },
   exibeConcluidas: { marginRight: '0' }
 });

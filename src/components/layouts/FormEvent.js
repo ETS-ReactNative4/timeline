@@ -10,7 +10,6 @@ import Typography from '@material-ui/core/Typography';
 import CloseIcon from '@material-ui/icons/Close';
 import Slide from '@material-ui/core/Slide';
 import TextField from '@material-ui/core/TextField';
-import AddIcon from '@material-ui/icons/Add';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
@@ -27,8 +26,9 @@ import { MuiPickersUtilsProvider } from 'material-ui-pickers';
 
 // pick utils
 import moment from 'moment';
+
 import 'moment/locale/pt-br';
-import 'moment/locale/pt-br';
+
 import MomentUtils from '@date-io/moment';
 
 import { TimePicker } from 'material-ui-pickers';
@@ -43,19 +43,19 @@ const localeMap = {
 };
 
 let counterDep = 0;
-function createDependencia(nome, uor, envolvimento, prefixo) {
+function createDependencia(nome, uor, envolvimento, prefixo, user) {
   counterDep += 1;
-  return { id: counterDep, nome, uor, envolvimento, prefixo };
+  return { id: counterDep, nome, uor, envolvimento, prefixo, user };
 }
 
 let counter = 0;
-function createFuncionario(nome, chave, envolvimento, prefixo) {
+function createFuncionario(nome, chave, envolvimento, prefixo, user) {
   counter += 1;
-  return { id: counter, nome, chave, envolvimento, prefixo };
+  return { id: counter, nome, chave, envolvimento, prefixo, user };
 }
 
 let counterParte = 0;
-function createParte(envolvimento, empresa, nome, telefone, email) {
+function createParte(envolvimento, empresa, nome, telefone, email, user) {
   counterParte += 1;
   return {
     id: counterParte,
@@ -63,7 +63,8 @@ function createParte(envolvimento, empresa, nome, telefone, email) {
     empresa,
     nome,
     telefone,
-    email
+    email,
+    user
   };
 }
 
@@ -122,17 +123,18 @@ function Transition(props) {
 }
 
 const envolvimentos = [
-  { id: 1, descricao: 'Visitou' },
-  { id: 2, descricao: 'Gerente Brasil' }
-];
-const envolvimentosEmpresa = [
-  { id: 1, descricao: 'Matriz Visitada' },
-  { id: 2, descricao: 'Holding' },
+  { id: 2, descricao: 'Visitou' },
   { id: 3, descricao: 'Vínculo Brasil' }
 ];
+const envolvimentosEmpresa = [
+  { id: 1, descricao: 'Visitada' },
+  { id: 2, descricao: 'Subsidiária Brasil' },
+  { id: 3, descricao: 'Holding' }
+];
 const envolvimentosDependencia = [
-  { id: 1, descricao: 'Do Cliente' },
-  { id: 2, descricao: 'Vínculo Brasil' }
+  { id: 1, descricao: 'Rede Externa' },
+  { id: 2, descricao: 'Gecex' },
+  { id: 3, descricao: 'Brasil' }
 ];
 
 class FormEvent extends React.Component {
@@ -158,7 +160,9 @@ class FormEvent extends React.Component {
         empresa: '',
         telefone: '',
         email: '',
-        envolvimento: ''
+        envolvimento: '',
+
+        chave: ''
       },
 
       errors: {},
@@ -191,7 +195,9 @@ class FormEvent extends React.Component {
   };
 
   handleDateChange = date => {
-    this.setState(Object.assign(this.state.evento, { dt_evento: date }));
+    this.setState(
+      Object.assign(this.state.evento, { dt_evento: moment.utc(date) })
+    );
   };
 
   handleClickOpen = () => {
@@ -257,6 +263,7 @@ class FormEvent extends React.Component {
     if (this.handleValidationForm()) {
       let { evento } = this.state;
       const { user, empresa } = this.props;
+      console.log(evento);
 
       let funcionario = {
         nome: user.NM_FUN,
@@ -273,7 +280,7 @@ class FormEvent extends React.Component {
         body: JSON.stringify({
           evento: evento,
           empresa: empresa,
-          tipoEvento: '[1,2,3,4,7]'
+          tipoEvento: '[1, 2, 3, 4, 7, 8, 9]'
         }),
         headers: {
           'x-access-token': window.sessionStorage.token,
@@ -309,7 +316,8 @@ class FormEvent extends React.Component {
         dependenciaChild.nome,
         dependenciaChild.uor,
         this.state.envolvimentoDependencia,
-        dependenciaChild.prefixo
+        dependenciaChild.prefixo,
+        this.props.user.CD_USU
       )
     ];
 
@@ -327,7 +335,8 @@ class FormEvent extends React.Component {
         funcionariosChild.nome,
         funcionariosChild.chave,
         funcionariosChild.envolvimento || this.state.envolvimento,
-        funcionariosChild.prefixo
+        funcionariosChild.prefixo,
+        this.props.user.CD_USU
       )
     ];
 
@@ -348,7 +357,8 @@ class FormEvent extends React.Component {
         empresaDataChild.pais,
         empresaDataChild.tabela_origem,
         empresaDataChild.bloco_origem,
-        this.state.envolvimentoEmpresa
+        this.state.envolvimentoEmpresa,
+        this.props.user.CD_USU
       )
     ];
 
@@ -473,8 +483,8 @@ class FormEvent extends React.Component {
   render() {
     const locale = localeMap[this.state.currentLocale];
 
-    const { classes, open } = this.props;
-
+    const { classes, open, user } = this.props;
+    console.log(user);
     const {
       evento,
       errors,
@@ -561,6 +571,8 @@ class FormEvent extends React.Component {
                   >
                     <MenuItem value={1}>Visita</MenuItem>
                     <MenuItem value={3}>Ligação</MenuItem>
+                    <MenuItem value={8}>E-mail</MenuItem>
+                    <MenuItem value={9}>Observações</MenuItem>
                   </Select>
                 </FormControl>
 

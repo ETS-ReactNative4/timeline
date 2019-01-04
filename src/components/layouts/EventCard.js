@@ -12,10 +12,11 @@ import amber from '@material-ui/core/colors/amber';
 import purple from '@material-ui/core/colors/purple';
 import ConfirmationDialogRaw from './ConfirmationDialogRaw';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
-import { Menu, MenuItem, Divider, Paper } from '@material-ui/core';
+import { Menu, MenuItem, Divider, Paper, Hidden } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import { green } from '@material-ui/core/colors';
-
+import 'moment/locale/pt-br';
+import { Edit } from '@material-ui/icons';
 const styles = theme => ({
   flex: {
     display: 'flex'
@@ -60,6 +61,13 @@ const styles = theme => ({
     padding: 3,
     backgroundColor: purple[800]
   },
+
+  tipoEventoColor8: {
+    margin: '10px 10px 0px 10px',
+    padding: 3,
+    backgroundColor: '#009688'
+  },
+
   sessaoTitulo: { marginTop: 24 },
   tipoEventoTitle: {
     color: 'white',
@@ -85,7 +93,7 @@ class EventCard extends React.Component {
       expanded: false,
       open: false
     };
-
+    this.tipoEvento = this.tipoEvento.bind();
     this.excluir = this.excluir.bind();
   }
   handleExpandClick = () => {
@@ -122,7 +130,7 @@ class EventCard extends React.Component {
       body: JSON.stringify({
         evento: evento,
         empresa: empresa,
-        tipoEvento: '[1,2,3,4,7]'
+        tipoEvento: '[1,2,3,4,7,8]'
       }),
       headers: {
         'x-access-token': window.sessionStorage.token,
@@ -149,9 +157,46 @@ class EventCard extends React.Component {
       });
   };
 
+  tipoEvento(evento, classes) {
+    switch (evento.tipo_evento_id) {
+      case 1:
+        return (
+          <div className={classes.tipoEventoColor1}>
+            <Typography variant="caption" className={classes.tipoEventoTitle}>
+              {evento.tipo_envolvimento_descricao}
+            </Typography>
+          </div>
+        );
+        break;
+
+      case 3:
+        return (
+          <div className={classes.tipoEventoColor2}>
+            <Typography variant="caption" className={classes.tipoEventoTitle}>
+              {evento.tipo_envolvimento_descricao}
+            </Typography>
+          </div>
+        );
+        break;
+
+      case 8:
+        return (
+          <div className={classes.tipoEventoColor8}>
+            <Typography variant="caption" className={classes.tipoEventoTitle}>
+              {evento.tipo_envolvimento_descricao}
+            </Typography>
+          </div>
+        );
+        break;
+
+      default:
+        break;
+    }
+  }
+
   render() {
     const { anchorEl } = this.state;
-    const { classes, evento } = this.props;
+    const { classes, evento, language } = this.props;
     const open = Boolean(anchorEl);
 
     return (
@@ -159,26 +204,7 @@ class EventCard extends React.Component {
         <Grid item className={classes.card}>
           <Paper>
             <div className={classes.tipoEvento}>
-              {evento.tipo_envolvimento_id === 1 ? (
-                <div className={classes.tipoEventoColor1}>
-                  <Typography
-                    variant="caption"
-                    className={classes.tipoEventoTitle}
-                  >
-                    {evento.tipo_envolvimento_descricao}
-                  </Typography>
-                </div>
-              ) : (
-                <div className={classes.tipoEventoColor2}>
-                  <Typography
-                    variant="caption"
-                    className={classes.tipoEventoTitle}
-                  >
-                    {evento.tipo_envolvimento_descricao}
-                  </Typography>
-                </div>
-              )}
-
+              {this.tipoEvento(evento, classes)}
               {evento.status === 1 ? (
                 <div className={classes.tipoEventoColor3}>
                   <Typography
@@ -203,18 +229,33 @@ class EventCard extends React.Component {
             <CardHeader
               className={classes.cardHeader}
               action={
-                <IconButton
-                  aria-label="More"
-                  aria-owns={open ? 'long-menu' : undefined}
-                  aria-haspopup="true"
-                  onClick={this.handleClick}
-                >
-                  <MoreVertIcon />
-                </IconButton>
+                <div>
+                  <Hidden mdDown>
+                    <IconButton
+                      background-color="inherit"
+                      aria-label="More"
+                      aria-owns={open ? 'long-menu' : undefined}
+                      aria-haspopup="true"
+                      onClick={this.handleOpen}
+                    >
+                      <Edit />
+                    </IconButton>
+                  </Hidden>
+                  <IconButton
+                    background-color="inherit"
+                    aria-label="More"
+                    aria-owns={open ? 'long-menu' : undefined}
+                    aria-haspopup="true"
+                    onClick={this.handleClick}
+                  >
+                    <MoreVertIcon />
+                  </IconButton>
+                </div>
               }
               title={evento.empresas ? evento.empresas[0].nome : ''}
-              subheader={moment(evento.dt_evento)
-                .locale('pt-BR')
+              subheader={moment
+                .utc(evento.dt_evento)
+                .locale(language)
                 .format('LLLL')}
             />
 
@@ -258,7 +299,9 @@ class EventCard extends React.Component {
 
               {evento.dependencias
                 ? evento.dependencias.map(dep => (
-                    <Typography variant="body1">{dep.prefixo}</Typography>
+                    <Typography variant="body1">
+                      {dep.prefixo + ' - ' + dep.nome}
+                    </Typography>
                   ))
                 : ''}
 

@@ -79,6 +79,7 @@ class CardGrid extends React.Component {
 
     this.setState({ open: open });
   };
+
   render() {
     const {
       classes,
@@ -87,12 +88,13 @@ class CardGrid extends React.Component {
       setEventos,
       empresa,
       dados,
-      user
+      user,
+      language
     } = this.props;
     const { open, eventoEdit, tipoDialog } = this.state;
     return (
       <div className={classes.root}>
-        <Grid container spacing={8}>
+        <Grid container spacing={0}>
           <Fab
             aria-label="Add"
             variant="extended"
@@ -115,57 +117,65 @@ class CardGrid extends React.Component {
               setEventos={setEventos}
               setDados={setDados}
               tipoDialog={tipoDialog}
+              language={language}
             />
           ) : (
             ''
           )}
-          <Grid item xs={12} md={12} lg={12} className={classes.root}>
-            <Typography variant="h4">{empresa.nome}</Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              {empresa.pais}
-            </Typography>
-          </Grid>
-          <Dashboard empresa={empresa} dados={dados} />
-
-          <Grid item lg={6} md={6} sm={12}>
-            <ToDo
-              tipoEvento={5}
-              iconColor={'#ffcd38'}
-              title={'Pendências BB'}
-              user={user}
-              empresa={empresa}
-            />
-          </Grid>
-          <Grid item lg={6} md={6} sm={12}>
-            <ToDo
-              tipoEvento={6}
-              iconColor={'#002884'}
-              title={'Pendências Empresa'}
-              user={user}
-              empresa={empresa}
-            />
-          </Grid>
-
-          {eventos.length > 0 ? (
-            eventos.map((evento, index) => (
-              <EventCard
-                empresa={empresa}
-                evento={evento}
-                setEventos={setEventos}
-                setDados={setDados}
-                key={index}
-                myCallbackOpenDialog={this.myCallbackOpenDialog}
-              />
-            ))
-          ) : (
-            <Grid item lg={12} md={12} sm={12}>
-              <Paper className={classes.root}>
-                <Typography variant="h5" className={classes.cardVazio}>
-                  Não há eventos para o cliente selecionado
-                </Typography>
-              </Paper>
+          <Grid container spacing={8}>
+            <Grid item xs={12} md={12} lg={12} className={classes.root}>
+              <Typography variant="h4">{empresa.nome}</Typography>
+              <Typography variant="subtitle1" color="textSecondary">
+                {empresa.pais}
+              </Typography>
             </Grid>
-          )}
+          </Grid>
+          <Grid container spacing={8}>
+            <Dashboard empresa={empresa} dados={dados} />
+          </Grid>
+          <Grid container spacing={8}>
+            <Grid item lg={6} md={6} sm={12}>
+              <ToDo
+                tipoEvento={5}
+                iconColor={'#ffcd38'}
+                title={'Pendências BB'}
+                user={user}
+                empresa={empresa}
+              />
+            </Grid>
+            <Grid item lg={6} md={6} sm={12}>
+              <ToDo
+                tipoEvento={6}
+                iconColor={'#002884'}
+                title={'Pendências Empresa'}
+                user={user}
+                empresa={empresa}
+              />
+            </Grid>
+          </Grid>
+          <Grid container spacing={8} style={{ marginTop: '8px' }}>
+            {eventos.length > 0 ? (
+              eventos.map((evento, index) => (
+                <EventCard
+                  language={language}
+                  empresa={empresa}
+                  evento={evento}
+                  setEventos={setEventos}
+                  setDados={setDados}
+                  key={index}
+                  myCallbackOpenDialog={this.myCallbackOpenDialog}
+                />
+              ))
+            ) : (
+              <Grid item lg={12} md={12} sm={12}>
+                <Paper className={classes.root}>
+                  <Typography variant="h5" className={classes.cardVazio}>
+                    Não há eventos para o cliente selecionado
+                  </Typography>
+                </Paper>
+              </Grid>
+            )}
+          </Grid>
         </Grid>
       </div>
     );

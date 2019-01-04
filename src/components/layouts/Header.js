@@ -43,8 +43,14 @@ class Header extends React.Component {
 
       eventos: [],
       eventoEdita: {},
-      dados: {}
+      dados: {},
+      language: 'pt-BR'
     };
+  }
+  userLanguege() {
+    const language = window.navigator.userLanguage || window.navigator.language;
+
+    this.setState({ language: language });
   }
 
   componentWillMount() {
@@ -60,6 +66,7 @@ class Header extends React.Component {
     if (JSON.stringify(empresa) !== '{}') {
       this.getEventos(empresa);
     }
+    this.userLanguege();
   }
 
   handleParams(params) {
@@ -134,7 +141,7 @@ class Header extends React.Component {
       method: 'POST',
       body: JSON.stringify({
         empresa: empresa,
-        tipoEvento: '[1, 2, 3, 4, 7]',
+        tipoEvento: '[1, 2, 3, 4, 7, 8, 9]',
         excluidos: true
       }),
       headers: {
@@ -165,7 +172,7 @@ class Header extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { url, eventos } = this.state;
+    const { url, eventos, language } = this.state;
     const { user } = this.props;
     const { empresa, dados } = this.state;
 
@@ -202,6 +209,7 @@ class Header extends React.Component {
             path="/timeline"
             render={props => (
               <CardGrid
+                language={language}
                 empresa={empresa}
                 eventos={eventos}
                 dados={dados}
