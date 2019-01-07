@@ -1,7 +1,8 @@
 import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
-import { Typography, Paper, Divider, Grid, Avatar } from '@material-ui/core';
+import { Typography, Divider, Grid, Avatar, Hidden } from '@material-ui/core';
+import moment from 'moment';
 import 'moment/locale/pt-br';
 
 const styles = theme => ({
@@ -20,9 +21,18 @@ const styles = theme => ({
     color: '#646464',
     textTransform: 'uppercase'
   },
-  headerChave: { color: '#646464' },
+  headerChave: {
+    color: '#646464',
+    flexGrow: 1
+  },
   content: {
     marginTop: theme.spacing.unit
+  },
+  headerDate: {
+    color: '#646464',
+    textAlign: 'right',
+    marginRight: theme.spacing.unit * 2,
+    marginLeft: theme.spacing.unit * 2
   }
 });
 
@@ -33,7 +43,7 @@ class CommentCard extends React.Component {
   }
 
   render() {
-    const { classes, comentario } = this.props;
+    const { classes, comentario, language } = this.props;
 
     return (
       <Fragment>
@@ -52,9 +62,26 @@ class CommentCard extends React.Component {
               <Typography className={classes.headerNome}>
                 {comentario.nome}
               </Typography>
+
               <Typography className={classes.headerChave}>
                 {comentario.chaveFunci}
               </Typography>
+              <Hidden mdDown>
+                <Typography className={classes.headerDate}>
+                  {moment
+                    .utc(comentario.dt_create)
+                    .locale(language)
+                    .format('LLLL')}
+                </Typography>
+              </Hidden>
+              <Hidden mdUp>
+                <Typography className={classes.headerDate}>
+                  {moment
+                    .utc(comentario.dt_create)
+                    .locale(language)
+                    .format('L')}
+                </Typography>
+              </Hidden>
             </Grid>
             <Typography className={classes.content}>
               {comentario.descricao}

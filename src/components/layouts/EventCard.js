@@ -127,6 +127,7 @@ class EventCard extends React.Component {
   }
 
   componentDidMount() {
+    console.log(this.props.evento.comentarios);
     if (this.props.evento.comentarios) {
       this.setState({ comentarios: this.props.evento.comentarios });
     }
@@ -205,7 +206,7 @@ class EventCard extends React.Component {
     let comentario = {
       descricao: newComment,
       eventoId: evento.id,
-      nome: user.NM_FUN,
+      nome: user.NM_RDZ_FUN,
       chaveFunci: user.CD_USU,
       prefixo: user.CD_PRF_DEPE_ATU,
       dt_create: new Date()
@@ -214,21 +215,28 @@ class EventCard extends React.Component {
   }
   addItem = e => {
     let errors = {};
-
+    let comentarios;
     if (this.state.newComment === '') {
-      errors['evento.descricao'] = 'Não pode estar vazio';
+      errors['comentario.descricao'] = 'Não pode estar vazio';
+      this.setState({
+        errors: errors
+      });
+      return;
     }
 
     this.setState({
-      comentarios: [...this.state.comentarios, this.createComment()]
+      errors: errors
     });
-    this.enviaComentario();
-    this.setState({
-      newComment: ''
-    });
+    comentarios = [...this.state.comentarios, this.createComment()];
+
+    console.log(comentarios);
+
+    this.setState({ comentarios: comentarios });
+
+    this.enviaComentario(comentarios);
 
     this.setState({
-      errors: errors
+      newComment: ''
     });
 
     e.preventDefault();
@@ -418,7 +426,7 @@ class EventCard extends React.Component {
                   <Typography variant="h6">Comentários</Typography>
                   <Divider />
                   {comentarios.map(comentario => (
-                    <CommentCard comentario={comentario} />
+                    <CommentCard comentario={comentario} language={language} />
                   ))}
                 </div>
 
@@ -475,12 +483,12 @@ class EventCard extends React.Component {
     );
   }
 
-  enviaComentario = () => {
+  enviaComentario = comentarios => {
     const { empresa } = this.props;
     let evento = this.props.evento;
 
-    evento.comentarios = this.state.comentarios;
-    console.log(this.state.comentarios);
+    evento.comentarios = comentarios;
+    console.log(comentarios);
 
     console.log(evento);
 

@@ -124,6 +124,7 @@ function Transition(props) {
 
 const envolvimentos = [
   { id: 2, descricao: 'Visitou' },
+  { id: 4, descricao: 'Ligou' },
   { id: 3, descricao: 'Vínculo Brasil' }
 ];
 const envolvimentosEmpresa = [
