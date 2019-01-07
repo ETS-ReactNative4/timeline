@@ -127,7 +127,6 @@ class EventCard extends React.Component {
   }
 
   componentDidMount() {
-    console.log(this.props.evento.comentarios);
     if (this.props.evento.comentarios) {
       this.setState({ comentarios: this.props.evento.comentarios });
     }
@@ -135,7 +134,6 @@ class EventCard extends React.Component {
 
   handleExpandClick = () => {
     this.setState(state => ({ expanded: !state.expanded }));
-    console.log(this.props.evento);
 
     if (this.props.evento.comentarios) {
       this.setState({ comentarios: this.props.evento.comentarios });
@@ -228,8 +226,6 @@ class EventCard extends React.Component {
       errors: errors
     });
     comentarios = [...this.state.comentarios, this.createComment()];
-
-    console.log(comentarios);
 
     this.setState({ comentarios: comentarios });
 
@@ -488,9 +484,6 @@ class EventCard extends React.Component {
     let evento = this.props.evento;
 
     evento.comentarios = comentarios;
-    console.log(comentarios);
-
-    console.log(evento);
 
     fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
       method: 'PUT',
