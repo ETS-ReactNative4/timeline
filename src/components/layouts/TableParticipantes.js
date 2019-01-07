@@ -46,16 +46,16 @@ function getSorting(order, orderBy) {
 }
 
 const rows = [
-  { id: 'nome', disablePadding: true, label: 'Nome' },
+  { id: 'nome', disablePadding: true, label: 'Name' },
   {
     id: 'envolvimento',
 
     disablePadding: true,
-    label: 'Envolvimento'
+    label: 'Position'
   },
 
-  { id: 'empresa', disablePadding: true, label: 'Empresa' },
-  { id: 'telefone', disablePadding: true, label: 'Telefone' },
+  { id: 'empresa', disablePadding: true, label: 'Company' },
+  { id: 'telefone', disablePadding: true, label: 'Telephone' },
   { id: 'email', disablePadding: true, label: 'Email' }
 ];
 

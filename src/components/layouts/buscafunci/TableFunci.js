@@ -46,13 +46,13 @@ function getSorting(order, orderBy) {
 }
 
 const rows = [
-  { id: 'nome', disablePadding: true, label: 'Nome' },
-  { id: 'chave', disablePadding: false, label: 'Chave' },
+  { id: 'nome', disablePadding: true, label: 'Name' },
+  { id: 'chave', disablePadding: false, label: 'Key' },
   {
     id: 'envolvimento',
 
     disablePadding: false,
-    label: 'Envolvimento'
+    label: 'Actions'
   }
 ];
 

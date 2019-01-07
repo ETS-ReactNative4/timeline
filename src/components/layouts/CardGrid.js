@@ -105,7 +105,7 @@ class CardGrid extends React.Component {
           >
             <AddIcon />
 
-            <Typography color="button">NOVO EVENTO</Typography>
+            <Typography color="button">NEW EVENT</Typography>
           </Fab>
 
           {this.state.open ? (
@@ -139,7 +139,7 @@ class CardGrid extends React.Component {
               <ToDo
                 tipoEvento={5}
                 iconColor={'#ffcd38'}
-                title={'Pendências BB'}
+                title={'Tasks BB'}
                 user={user}
                 empresa={empresa}
               />
@@ -148,7 +148,7 @@ class CardGrid extends React.Component {
               <ToDo
                 tipoEvento={6}
                 iconColor={'#002884'}
-                title={'Pendências Empresa'}
+                title={'Tasks Company'}
                 user={user}
                 empresa={empresa}
               />
@@ -172,7 +172,7 @@ class CardGrid extends React.Component {
               <Grid item lg={12} md={12} sm={12}>
                 <Paper className={classes.root}>
                   <Typography variant="h5" className={classes.cardVazio}>
-                    Não há eventos para o cliente selecionado
+                    No events for this company
                   </Typography>
                 </Paper>
               </Grid>

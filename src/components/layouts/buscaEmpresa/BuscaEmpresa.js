@@ -204,10 +204,10 @@ class BuscaEmpresa extends React.Component {
         <Autosuggest
           {...autosuggestProps}
           inputProps={{
-            label: 'Buscar empresas',
+            label: 'Search company',
             classes,
             errors,
-            placeholder: 'Buscar por CNPJ, MCI, Nome',
+            placeholder: 'Search by Name, CNPJ, MCI',
             value: value,
             onKeyUp: this.search,
             onChange: this.handleChange('value')

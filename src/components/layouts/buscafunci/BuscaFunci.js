@@ -211,8 +211,8 @@ class BuscaFunci extends React.Component {
           inputProps={{
             classes,
             errors,
-            label: 'Buscar funcionários',
-            placeholder: 'Buscar por Chave, Nome',
+            label: 'Search Employee',
+            placeholder: 'Search by Name, F-Key or Z-Key',
             value: value,
             onKeyUp: this.search,
             onChange: this.handleChange('value')

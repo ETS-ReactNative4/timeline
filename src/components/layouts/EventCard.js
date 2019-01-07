@@ -398,7 +398,7 @@ class EventCard extends React.Component {
                 gutterBottom
                 className={classes.sessaoTitulo}
               >
-                Empresas
+                Company
               </Typography>
               <Divider />
 
@@ -423,7 +423,7 @@ class EventCard extends React.Component {
             <Collapse in={this.state.expanded} timeout="auto" unmountOnExit>
               <CardContent>
                 <div>
-                  <Typography variant="h6">Comentários</Typography>
+                  <Typography variant="h6">Comments</Typography>
                   <Divider />
                   {comentarios.map(comentario => (
                     <CommentCard comentario={comentario} language={language} />
@@ -454,7 +454,7 @@ class EventCard extends React.Component {
                   type="submit"
                   onClick={this.addItem}
                 >
-                  Adicionar Novo Comentário
+                  Add New Comment
                 </Button>
               </CardContent>
             </Collapse>

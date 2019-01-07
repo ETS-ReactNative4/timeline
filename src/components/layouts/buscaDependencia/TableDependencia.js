@@ -46,8 +46,8 @@ function getSorting(order, orderBy) {
 }
 
 const rows = [
-  { id: 'nome', disablePadding: true, label: 'Nome' },
-  { id: 'prefixo', disablePadding: false, label: 'Prefixo' },
+  { id: 'nome', disablePadding: true, label: 'Name' },
+  { id: 'prefixo', disablePadding: false, label: 'Key (Prefixo)' },
   { id: 'envolvimento', disablePadding: false, label: 'Tipo' }
 ];
 

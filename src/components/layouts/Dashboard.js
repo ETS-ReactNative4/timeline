@@ -42,7 +42,7 @@ class Dashboard extends React.Component {
             <CardIcon bgColor="#FF6F00" Icon={Schedule} />
             <Card className={classes.card}>
               <Typography className={classes.cardCategory}>
-                Visitas Pendentes
+                Pending meetings {/*Visitas Pendentes */}
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>
                 {dados.Visitas_Pendentes}
@@ -56,7 +56,7 @@ class Dashboard extends React.Component {
             <CardIcon bgColor="#43A047" Icon={DoneAll} />
             <Card className={classes.card}>
               <Typography variant="h6" className={classes.cardCategory}>
-                Visitas Concluídas
+                Concluded meetings {/*Visitas Concluídas */}
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>
                 {dados.Visitas_Concluidas}
@@ -71,7 +71,7 @@ class Dashboard extends React.Component {
 
             <Card className={classes.card}>
               <Typography variant="h6" className={classes.cardCategory}>
-                Ligações
+                Calls
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>
                 {dados.ligacoes}
@@ -101,7 +101,7 @@ class Dashboard extends React.Component {
 
             <Card className={classes.card}>
               <Typography variant="h6" className={classes.cardCategory}>
-                Observações
+                Remarks
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>
                 {dados.observacao}
@@ -114,7 +114,7 @@ class Dashboard extends React.Component {
             <CardIcon bgColor="#0D47A1" Icon={Event} />
             <Card className={classes.card}>
               <Typography variant="h6" className={classes.cardCategory}>
-                Total de Eventos
+                Total of Events
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>
                 {dados.Total_de_Eventos}

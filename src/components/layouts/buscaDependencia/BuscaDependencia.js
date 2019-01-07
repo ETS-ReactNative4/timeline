@@ -9,7 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import MenuItem from '@material-ui/core/MenuItem';
 import { withStyles } from '@material-ui/core/styles';
 
-const WAIT_INTERVAL = 2000;
+const WAIT_INTERVAL = 1500;
 
 const suggestions = [];
 
@@ -208,8 +208,8 @@ class BuscaDependencia extends React.Component {
           inputProps={{
             errors,
             classes,
-            label: 'Buscar dependências',
-            placeholder: 'Buscar por UOR, Prefixo, Nome',
+            label: 'Search units',
+            placeholder: 'Search by Name, UOR, Key (Prefixo)',
             value: value,
             onKeyUp: this.search,
             onChange: this.handleChange('value')

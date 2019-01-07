@@ -255,7 +255,7 @@ class ToDo extends React.Component {
                   color="primary"
                 />
               }
-              label="Exibe concluídas"
+              label="Show done"
             />
           </div>
 
@@ -286,8 +286,11 @@ class ToDo extends React.Component {
           </List>
 
           <TextField
-            label="Tarefa"
-            placeholder="Tarefa"
+            InputLabelProps={{
+              shrink: true
+            }}
+            label="Task"
+            placeholder="Task"
             multiline
             className={classes.inputs}
             margin="normal"
@@ -302,7 +305,7 @@ class ToDo extends React.Component {
             type="submit"
             onClick={this.addItem}
           >
-            Adicionar Nova {title}
+            Add new {title}
           </Button>
         </Paper>
       </div>

@@ -115,6 +115,11 @@ const styles = theme => ({
   inputs: {
     marginTop: theme.spacing.unit * 4,
     flexGrow: 1
+  },
+  textoAjuda: {
+    paddingTop: theme.spacing.unit * 2,
+    paddingBottom: theme.spacing.unit * 2,
+    textAlign: 'center'
   }
 });
 
@@ -165,7 +170,7 @@ class FormEvent extends React.Component {
 
         chave: ''
       },
-
+      formIsValid: true,
       errors: {},
 
       envolvimentoFuncionario: 2,
@@ -454,8 +459,8 @@ class FormEvent extends React.Component {
   handleValidationForm() {
     const { evento } = this.state;
     let errors = {};
-    let formIsValid = true;
 
+    let formIsValid = true;
     if (evento.descricao === '') {
       formIsValid = false;
       errors['evento.descricao'] = 'Não pode estar vazio';
@@ -482,14 +487,18 @@ class FormEvent extends React.Component {
     }
 
     this.setState({ errors: errors });
+
+    this.setState({ formIsValid: formIsValid });
     return formIsValid;
   }
 
   render() {
     const locale = localeMap[this.state.currentLocale];
-
+    {
+      console.log(this.state.formIsValid);
+    }
     const { classes, open, user } = this.props;
-    console.log(user);
+
     const {
       evento,
       errors,
@@ -517,7 +526,7 @@ class FormEvent extends React.Component {
                 <CloseIcon />
               </IconButton>
               <Typography variant="h6" color="inherit">
-                {evento ? 'Editar Evento' : 'Novo Evento'}
+                {evento ? 'Edit Event' : 'New Event'}
               </Typography>
             </Toolbar>
           </AppBar>
@@ -531,7 +540,8 @@ class FormEvent extends React.Component {
                   moment={moment}
                 >
                   <DatePicker
-                    label="Data"
+                    label="Date"
+                    format="L"
                     fullWidth
                     value={evento.dt_evento}
                     onChange={this.handleDateChange}
@@ -539,7 +549,7 @@ class FormEvent extends React.Component {
                   />
 
                   <TimePicker
-                    label="Hora"
+                    label="Time"
                     fullWidth
                     value={evento.dt_evento}
                     onChange={this.handleDateChange}
@@ -550,8 +560,8 @@ class FormEvent extends React.Component {
                   InputLabelProps={{
                     shrink: true
                   }}
-                  label="Assunto/Tema"
-                  placeholder="Assunto/Tema"
+                  label="Agenda"
+                  placeholder="Agenda"
                   error={!errors['evento.assunto'] ? false : true}
                   helperText={errors['evento.assunto']}
                   className={classes.inputs}
@@ -565,8 +575,8 @@ class FormEvent extends React.Component {
                   InputLabelProps={{
                     shrink: true
                   }}
-                  label="Descrição"
-                  placeholder="Descrição"
+                  label="Report"
+                  placeholder="Report"
                   error={!errors['evento.descricao'] ? false : true}
                   helperText={errors['evento.descricao']}
                   className={classes.inputs}
@@ -579,9 +589,7 @@ class FormEvent extends React.Component {
                 />
 
                 <FormControl fullWidth className={classes.inputs}>
-                  <InputLabel htmlFor="tipo-evento-simple">
-                    Tipo Evento
-                  </InputLabel>
+                  <InputLabel htmlFor="tipo-evento-simple">Event</InputLabel>
                   <Select
                     value={evento['tipo_evento_id']}
                     onChange={this.handleChange('tipo_evento_id')}
@@ -590,10 +598,10 @@ class FormEvent extends React.Component {
                       id: 'tipo-evento-simple'
                     }}
                   >
-                    <MenuItem value={1}>Visita</MenuItem>
-                    <MenuItem value={3}>Ligação</MenuItem>
-                    <MenuItem value={8}>E-mail</MenuItem>
-                    <MenuItem value={9}>Observações</MenuItem>
+                    <MenuItem value={1}>Meeting</MenuItem>
+                    <MenuItem value={3}>Call</MenuItem>
+                    <MenuItem value={8}>Email</MenuItem>
+                    <MenuItem value={9}>Remarks</MenuItem>
                   </Select>
                 </FormControl>
 
@@ -607,20 +615,20 @@ class FormEvent extends React.Component {
                       id: 'status-simple'
                     }}
                   >
-                    <MenuItem value={1}>Pendente</MenuItem>
+                    <MenuItem value={1}>Pending</MenuItem>
 
-                    <MenuItem value={2}>Concluído</MenuItem>
+                    <MenuItem value={2}>Concluded</MenuItem>
                   </Select>
                 </FormControl>
               </div>
               <div className={classes.formSection}>
                 <Typography variant="h5" gutterBottom>
-                  Dependências
+                  BB Units
                 </Typography>
                 <Divider />
                 <FormControl fullWidth className={classes.inputs}>
                   <InputLabel htmlFor="envolvimento-dependencia">
-                    Envolvimento
+                    Players
                   </InputLabel>
                   <Select
                     value={envolvimentoDependencia}
@@ -653,12 +661,12 @@ class FormEvent extends React.Component {
               </div>
               <div className={classes.formSection}>
                 <Typography variant="h5" gutterBottom>
-                  Participantes BB
+                  Participants BB
                 </Typography>
                 <Divider />
                 <FormControl fullWidth className={classes.inputs}>
                   <InputLabel htmlFor="envolvimentoFuncionario-simple">
-                    Envolvimento
+                    Actions
                   </InputLabel>
                   <Select
                     value={envolvimentoFuncionario}
@@ -691,13 +699,11 @@ class FormEvent extends React.Component {
               </div>
               <div className={classes.formSection}>
                 <Typography variant="h5" gutterBottom>
-                  Empresas
+                  Companies
                 </Typography>
                 <Divider />
                 <FormControl fullWidth className={classes.inputs}>
-                  <InputLabel htmlFor="envolvimento-empresa">
-                    Envolvimento
-                  </InputLabel>
+                  <InputLabel htmlFor="envolvimento-empresa">What</InputLabel>
                   <Select
                     value={envolvimentoEmpresa}
                     onChange={this.handleChange('envolvimentoEmpresa')}
@@ -728,16 +734,16 @@ class FormEvent extends React.Component {
               </div>
               <div className={classes.formSection}>
                 <Typography variant="h5" gutterBottom>
-                  Participantes das Empresas/Outros
+                  Participants from Company
                 </Typography>
                 <Divider />
                 <TextField
                   InputLabelProps={{
                     shrink: true
                   }}
-                  placeholder="Sócio, Diretor, Gerente, etc..."
+                  placeholder="CEO, CFO, Director, Manager etc"
                   id="standard-envolvimento"
-                  label="Envolvimento"
+                  label="Position"
                   fullWidth
                   error={!errors['participante.envolvimento'] ? false : true}
                   helperText={errors['participante.envolvimento']}
@@ -752,7 +758,7 @@ class FormEvent extends React.Component {
                     shrink: true
                   }}
                   id="standard-empresa"
-                  label="Empresa"
+                  label="Company"
                   fullWidth
                   error={!errors['participante.empresa'] ? false : true}
                   helperText={errors['participante.empresa']}
@@ -766,7 +772,7 @@ class FormEvent extends React.Component {
                     shrink: true
                   }}
                   id="standard-nome"
-                  label="Nome"
+                  label="Name"
                   fullWidth
                   error={!errors['participante.nome'] ? false : true}
                   helperText={errors['participante.nome']}
@@ -781,7 +787,7 @@ class FormEvent extends React.Component {
                     shrink: true
                   }}
                   id="standard-telefone"
-                  label="Telefone"
+                  label="Telephone"
                   placeholder="+55 555-555-55555"
                   fullWidth
                   error={!errors['participante.telefone'] ? false : true}
@@ -808,12 +814,26 @@ class FormEvent extends React.Component {
                   margin="normal"
                 />
                 <Button fullWidth onClick={this.addParticipante}>
-                  Adicionar participante
+                  Add participant
                 </Button>
                 <TableParticipante
                   data={evento.participantes || []}
                   deleteItemListbyId={this.deleteItemListbyId}
                 />
+
+                {!this.state.formIsValid ? (
+                  <div>
+                    <Typography color="error" className={classes.textoAjuda}>
+                      Verique se há campos vazios, por favor volte e revise o
+                      formulário.
+                    </Typography>
+                    <Typography color="error" className={classes.textoAjuda}>
+                      Form can't have empty values
+                    </Typography>
+                  </div>
+                ) : (
+                  ''
+                )}
 
                 <div className={classes.buttons}>
                   <Button
@@ -823,7 +843,7 @@ class FormEvent extends React.Component {
                     fullWidth
                     className={classes.button}
                   >
-                    {evento.id ? 'Editar' : 'Salvar'}
+                    {evento.id ? 'Edit' : 'Save'}
                   </Button>
                 </div>
               </div>
