@@ -18,7 +18,8 @@ const styles = theme => ({
   cardCategory: {
     margin: 0,
     fontSize: '18px',
-    padding: '10px'
+    padding: 10,
+    paddingLeft: 0
   },
   cardTitle: {
     paddingRight: '10px',
