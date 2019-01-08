@@ -521,7 +521,7 @@ class FormEvent extends React.Component {
 
   render() {
     const locale = localeMap[this.state.currentLocale];
-    const { classes, open, user } = this.props;
+    const { classes, open } = this.props;
 
     const {
       evento,
@@ -763,8 +763,8 @@ class FormEvent extends React.Component {
                   label="Action"
                   fullWidth
                   className={classes.textField}
-                  value={envolvimentoFuncionario}
-                  onChange={this.handleChange('envolvimentoFuncionario')}
+                  value={envolvimentoEmpresa}
+                  onChange={this.handleChange('envolvimentoEmpresa')}
                   margin="normal"
                 />
 

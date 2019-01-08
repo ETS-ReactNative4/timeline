@@ -69,8 +69,6 @@ class CardGrid extends React.Component {
   };
 
   createEvento = () => {
-    const { empresa, user } = this.props;
-
     let evento = {
       id: undefined,
       descricao: '',
@@ -112,7 +110,7 @@ class CardGrid extends React.Component {
           >
             <AddIcon />
 
-            <Typography color="button">NEW EVENT</Typography>
+            <Typography>NEW EVENT</Typography>
           </Fab>
 
           {this.state.open ? (

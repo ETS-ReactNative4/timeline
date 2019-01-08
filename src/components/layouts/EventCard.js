@@ -337,8 +337,7 @@ class EventCard extends React.Component {
                 </div>
               }
               title={evento.empresas ? evento.empresas[0].nome : ''}
-              subheader={moment
-                .utc(evento.dt_evento)
+              subheader={moment(evento.dt_evento)
                 .locale(language)
                 .format('LLLL')}
             />
@@ -359,16 +358,14 @@ class EventCard extends React.Component {
                 {evento.funcionarios
                   ? evento.funcionarios.map(funci => {
                       return (
-                        <div>
-                          <Avatar
-                            alt={funci.nome}
-                            key={funci.chave}
-                            className={classes.smallAvatar}
-                            src={`https://humanograma.intranet.bb.com.br/avatar/${
-                              funci.chave
-                            }`}
-                          />
-                        </div>
+                        <Avatar
+                          alt={funci.nome}
+                          key={funci.chave}
+                          className={classes.smallAvatar}
+                          src={`https://humanograma.intranet.bb.com.br/avatar/${
+                            funci.chave
+                          }`}
+                        />
                       );
                     })
                   : ''}
@@ -384,7 +381,7 @@ class EventCard extends React.Component {
 
               {evento.dependencias
                 ? evento.dependencias.map(dep => (
-                    <Typography variant="body1">
+                    <Typography variant="body1" key={dep.prefixo}>
                       {dep.prefixo + ' - ' + dep.nome}
                     </Typography>
                   ))
@@ -400,8 +397,11 @@ class EventCard extends React.Component {
               <Divider />
 
               {evento.empresas
-                ? evento.empresas.map(empresa => (
-                    <Typography variant="body1"> {empresa.nome}</Typography>
+                ? evento.empresas.map((empresa, index) => (
+                    <Typography variant="body1" key={index}>
+                      {' '}
+                      {empresa.nome}
+                    </Typography>
                   ))
                 : ''}
             </CardContent>
