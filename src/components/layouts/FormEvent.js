@@ -35,8 +35,6 @@ import { TimePicker } from 'material-ui-pickers';
 import { DatePicker } from 'material-ui-pickers';
 import { Divider } from '@material-ui/core';
 
-moment.locale('pt-br');
-
 const localeMap = {
   en: 'en',
   pt: 'pt-br'
@@ -76,8 +74,20 @@ function createEmpresa(
   pais,
   tabela_origem,
   bloco_origem,
-  envolvimento
+  envolvimento,
+  user
 ) {
+  console.log(
+    nome,
+    mci,
+    cod_pais,
+    pais,
+    tabela_origem,
+    bloco_origem,
+    envolvimento,
+    user
+  );
+
   counterEmp += 1;
   return {
     id: counterEmp,
@@ -87,7 +97,8 @@ function createEmpresa(
     pais,
     tabela_origem,
     bloco_origem,
-    envolvimento
+    envolvimento,
+    user
   };
 }
 const styles = theme => ({
@@ -127,22 +138,6 @@ function Transition(props) {
   return <Slide direction="up" {...props} />;
 }
 
-const envolvimentos = [
-  { id: 2, descricao: 'Visitou' },
-  { id: 4, descricao: 'Ligou' },
-  { id: 3, descricao: 'Vínculo Brasil' }
-];
-const envolvimentosEmpresa = [
-  { id: 1, descricao: 'Visitada' },
-  { id: 2, descricao: 'Subsidiária Brasil' },
-  { id: 3, descricao: 'Holding' }
-];
-const envolvimentosDependencia = [
-  { id: 1, descricao: 'Rede Externa' },
-  { id: 2, descricao: 'Gecex' },
-  { id: 3, descricao: 'Brasil' }
-];
-
 class FormEvent extends React.Component {
   constructor(props) {
     super(props);
@@ -150,7 +145,6 @@ class FormEvent extends React.Component {
     this.state = {
       currentLocale: 'pt-br',
       evento: {
-        id: undefined,
         descricao: '',
         status: 1,
         tipo_evento_id: 1,
@@ -173,10 +167,10 @@ class FormEvent extends React.Component {
       formIsValid: true,
       errors: {},
 
-      envolvimentoFuncionario: 2,
-      envolvimentoEmpresa: 1,
-      envolvimentoParticipantesEmpresa: 1,
-      envolvimentoDependencia: 1
+      envolvimentoFuncionario: '',
+      envolvimentoEmpresa: '',
+      envolvimentoParticipantesEmpresa: '',
+      envolvimentoDependencia: ''
     };
     this.enviaForm = this.enviaForm.bind(this);
     this.handleDateChange = this.handleDateChange.bind(this);
@@ -186,9 +180,47 @@ class FormEvent extends React.Component {
   componentDidMount() {
     if (this.props.eventoEdit) {
       this.setState({ evento: this.props.eventoEdit });
+    } else {
+      this.createEvento();
     }
   }
 
+  createEvento = () => {
+    let { empresa, user } = this.props;
+
+    let evento = {
+      descricao: '',
+      assunto: '',
+      status: 1,
+      tipo_evento_id: 1,
+      dt_evento: new Date(),
+
+      participantes: [],
+      funcionarios: [],
+      dependencias: [],
+      empresas: []
+    };
+
+    user.envolvimento = 'Event owner';
+
+    empresa.envolvimento = 'Target';
+
+    console.log(user);
+
+    this.setDependencia({
+      nome: user.nome_reduzido,
+      uor: user.uor,
+      prefixo: user.CD_PRF_DEPE_ATU,
+      envolvimento: 'Event owner unit',
+      user: user.chave
+    });
+
+    this.setFuncionario(user);
+
+    this.setEmpresas(empresa);
+
+    return evento;
+  };
   handleChange = input => e => {
     this.setState(
       Object.assign(this.state.evento, { [input]: e.target.value })
@@ -202,7 +234,7 @@ class FormEvent extends React.Component {
 
   handleDateChange = date => {
     this.setState(
-      Object.assign(this.state.evento, { dt_evento: moment.utc(date) })
+      Object.assign(this.state.evento, { dt_evento: new Date(date) })
     );
   };
 
@@ -269,19 +301,14 @@ class FormEvent extends React.Component {
     if (this.handleValidationForm()) {
       let { evento } = this.state;
       console.log(evento);
-      const { user, empresa } = this.props;
-      let funcionario = {
-        nome: user.NM_FUN,
-        chave: user.CD_USU,
-        envolvimento: 99,
-        prefixo: user.CD_PRF_DEPE_ATU
-      };
-      this.setState({
-        funcionarios: [...this.state.funcionarios, funcionario]
-      });
+
+      const { empresa } = this.props;
+
+      const method = evento.id ? 'PUT' : 'POST';
+      console.log(method);
 
       fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
-        method: evento.id ? 'PUT' : 'POST',
+        method: method,
         body: JSON.stringify({
           evento: evento,
           empresa: empresa,
@@ -320,7 +347,7 @@ class FormEvent extends React.Component {
       createDependencia(
         dependenciaChild.nome,
         dependenciaChild.uor,
-        this.state.envolvimentoDependencia,
+        dependenciaChild.envolvimento || this.state.envolvimentoDependencia,
         dependenciaChild.prefixo,
         this.props.user.CD_USU
       )
@@ -362,7 +389,7 @@ class FormEvent extends React.Component {
         empresaDataChild.pais,
         empresaDataChild.tabela_origem,
         empresaDataChild.bloco_origem,
-        this.state.envolvimentoEmpresa,
+        empresaDataChild.envolvimento || this.state.envolvimentoEmpresa,
         this.props.user.CD_USU
       )
     ];
@@ -402,7 +429,7 @@ class FormEvent extends React.Component {
           empresa: '',
           telefone: '',
           email: '',
-          tipo_envolvimento_id: ''
+          envolvimento: ''
         }
       });
     }
@@ -494,9 +521,6 @@ class FormEvent extends React.Component {
 
   render() {
     const locale = localeMap[this.state.currentLocale];
-    {
-      console.log(this.state.formIsValid);
-    }
     const { classes, open, user } = this.props;
 
     const {
@@ -626,7 +650,21 @@ class FormEvent extends React.Component {
                   BB Units
                 </Typography>
                 <Divider />
-                <FormControl fullWidth className={classes.inputs}>
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  placeholder="Enter why the unit is involved with the this Event etc"
+                  id="standard-envolvimento"
+                  label="Action"
+                  fullWidth
+                  className={classes.textField}
+                  value={envolvimentoDependencia}
+                  onChange={this.handleChange('envolvimentoDependencia')}
+                  margin="normal"
+                />
+
+                {/* <FormControl fullWidth className={classes.inputs}>
                   <InputLabel htmlFor="envolvimento-dependencia">
                     Players
                   </InputLabel>
@@ -647,7 +685,7 @@ class FormEvent extends React.Component {
                       </MenuItem>
                     ))}
                   </Select>
-                </FormControl>
+                    </FormControl>*/}
                 <BuscaDependencia
                   errors={errors}
                   addSuggestion={this.setDependencia}
@@ -664,7 +702,21 @@ class FormEvent extends React.Component {
                   Participants BB
                 </Typography>
                 <Divider />
-                <FormControl fullWidth className={classes.inputs}>
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  placeholder="Enter why the participant is involved with the this Event etc"
+                  id="standard-envolvimento"
+                  label="Action"
+                  fullWidth
+                  className={classes.textField}
+                  value={envolvimentoFuncionario}
+                  onChange={this.handleChange('envolvimentoFuncionario')}
+                  margin="normal"
+                />
+
+                {/*   <FormControl fullWidth className={classes.inputs}>
                   <InputLabel htmlFor="envolvimentoFuncionario-simple">
                     Actions
                   </InputLabel>
@@ -686,7 +738,7 @@ class FormEvent extends React.Component {
                       </MenuItem>
                     ))}
                   </Select>
-                </FormControl>
+                    </FormControl>*/}
                 <BuscaFunci
                   setFuncionario={this.setFuncionario}
                   errors={errors}
@@ -702,6 +754,21 @@ class FormEvent extends React.Component {
                   Companies
                 </Typography>
                 <Divider />
+                <TextField
+                  InputLabelProps={{
+                    shrink: true
+                  }}
+                  placeholder="Enter why the company is involved with the this Event etc"
+                  id="standard-envolvimento"
+                  label="Action"
+                  fullWidth
+                  className={classes.textField}
+                  value={envolvimentoFuncionario}
+                  onChange={this.handleChange('envolvimentoFuncionario')}
+                  margin="normal"
+                />
+
+                {/*
                 <FormControl fullWidth className={classes.inputs}>
                   <InputLabel htmlFor="envolvimento-empresa">What</InputLabel>
                   <Select
@@ -721,7 +788,7 @@ class FormEvent extends React.Component {
                       </MenuItem>
                     ))}
                   </Select>
-                </FormControl>
+                </FormControl>*/}
                 <BuscaEmpresa
                   addSuggestion={this.setEmpresas}
                   errors={errors}

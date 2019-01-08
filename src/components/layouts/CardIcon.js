@@ -5,7 +5,7 @@ import { withStyles } from '@material-ui/core/styles';
 const styles = {
   card: {
     float: 'left',
-    margin: '-10px 20px 0 15px',
+    margin: '-10px 0px 0 10px',
     zIndex: 500,
     borderRadius: 3
   },

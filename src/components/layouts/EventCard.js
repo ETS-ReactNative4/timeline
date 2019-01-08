@@ -115,7 +115,7 @@ class EventCard extends React.Component {
     super(props);
     this.state = {
       anchorEl: null,
-      expanded: true,
+      expanded: false,
       open: false,
       newComment: '',
       comentarios: [],
@@ -225,7 +225,7 @@ class EventCard extends React.Component {
     this.setState({
       errors: errors
     });
-    comentarios = [...this.state.comentarios, this.createComment()];
+    comentarios = [this.createComment(), ...this.state.comentarios];
 
     this.setState({ comentarios: comentarios });
 
@@ -344,6 +344,7 @@ class EventCard extends React.Component {
             />
 
             <CardContent>
+              <Typography variant="h6">{evento.assunto}</Typography>
               <Typography component="p">{evento.descricao}</Typography>
 
               <Typography
@@ -421,17 +422,14 @@ class EventCard extends React.Component {
                 <div>
                   <Typography variant="h6">Comments</Typography>
                   <Divider />
-                  {comentarios.map(comentario => (
-                    <CommentCard comentario={comentario} language={language} />
-                  ))}
                 </div>
 
                 <TextField
                   InputLabelProps={{
                     shrink: true
                   }}
-                  label="Novo Comentário"
-                  placeholder="Novo Comentário"
+                  label="New Comment"
+                  placeholder="New Comment"
                   error={!errors['evento.descricao'] ? false : true}
                   helperText={errors['evento.descricao']}
                   className={classes.inputs}
@@ -452,6 +450,10 @@ class EventCard extends React.Component {
                 >
                   Add New Comment
                 </Button>
+
+                {comentarios.map(comentario => (
+                  <CommentCard comentario={comentario} language={language} />
+                ))}
               </CardContent>
             </Collapse>
           </Paper>

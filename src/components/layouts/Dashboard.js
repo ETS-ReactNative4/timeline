@@ -6,12 +6,10 @@ import { withStyles } from '@material-ui/core/styles';
 import CardIcon from './CardIcon';
 import {
   DoneAll,
-  PersonAdd,
   Event,
   Schedule,
   Phone,
   EmailOutlined,
-  NoteOutlined,
   NotesSharp
 } from '@material-ui/icons';
 const styles = theme => ({

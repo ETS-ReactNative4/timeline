@@ -57,7 +57,21 @@ class CardGrid extends React.Component {
   };
 
   myCallbackOpenDialog = (open, target, evento) => {
-    let eventoNew = {
+    if (target == 'newEvento') {
+      this.state({
+        eventoEdit: this.createEvento()
+      });
+    } else {
+      this.setState({ eventoEdit: evento });
+    }
+
+    this.setState({ open: open });
+  };
+
+  createEvento = () => {
+    const { empresa, user } = this.props;
+
+    let evento = {
       id: undefined,
       descricao: '',
       assunto: '',
@@ -70,15 +84,8 @@ class CardGrid extends React.Component {
       dependencias: [],
       empresas: []
     };
-    if (target == 'newEvento') {
-      this.state({
-        eventoEdit: eventoNew
-      });
-    } else {
-      this.setState({ eventoEdit: evento });
-    }
 
-    this.setState({ open: open });
+    return evento;
   };
 
   render() {

@@ -9,6 +9,7 @@ import { Route } from 'react-router-dom';
 import Busca from './busca/Busca';
 import FormControl from '@material-ui/core/FormControl';
 import logo from '../../bancodobrasil.png';
+import flag from '../../eng.png';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import CardGrid from './CardGrid';
 import { Avatar } from '@material-ui/core';
@@ -190,6 +191,12 @@ class Header extends React.Component {
               >
                 UCE Timeline
               </Typography>
+              <img
+                style={{ margin: 8 }}
+                id="eng"
+                src={flag}
+                alt="Flag English"
+              />
               <Avatar
                 alt={this.props.user.CD_USU}
                 src={

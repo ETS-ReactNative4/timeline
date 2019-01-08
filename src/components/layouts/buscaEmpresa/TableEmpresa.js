@@ -49,7 +49,7 @@ const rows = [
   { id: 'nome', disablePadding: true, label: 'Name' },
   { id: 'mci', disablePadding: false, label: 'MCI' },
   { id: 'pais', disablePadding: false, label: 'Country' },
-  { id: 'tipo', disablePadding: false, label: 'What' }
+  { id: 'envolvimento', disablePadding: false, label: 'Action' }
 ];
 
 class EnhancedTableHead extends React.Component {
@@ -307,7 +307,7 @@ class EnhancedTable extends React.Component {
                       </TableCell>
                       <TableCell>{n.mci}</TableCell>
                       <TableCell>{n.pais}</TableCell>
-                      <TableCell>{n.tipo}</TableCell>
+                      <TableCell>{n.envolvimento}</TableCell>
                     </TableRow>
                   );
                 })}

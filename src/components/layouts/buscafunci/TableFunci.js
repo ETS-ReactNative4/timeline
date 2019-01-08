@@ -52,7 +52,7 @@ const rows = [
     id: 'envolvimento',
 
     disablePadding: false,
-    label: 'Actions'
+    label: 'Action'
   }
 ];
 

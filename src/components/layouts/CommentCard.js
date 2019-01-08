@@ -62,7 +62,6 @@ class CommentCard extends React.Component {
               <Typography className={classes.headerNome}>
                 {comentario.nome}
               </Typography>
-
               <Typography className={classes.headerChave}>
                 {comentario.chaveFunci}
               </Typography>
