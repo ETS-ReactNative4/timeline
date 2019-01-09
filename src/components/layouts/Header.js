@@ -48,7 +48,7 @@ class Header extends React.Component {
       language: 'pt-BR'
     };
   }
-  userLanguege() {
+  userLanguage() {
     const language = window.navigator.userLanguage || window.navigator.language;
 
     this.setState({ language: language });
@@ -56,22 +56,26 @@ class Header extends React.Component {
 
   componentWillMount() {
     this.setState({ visao: window.sessionStorage.visao || 1 });
+
     let empresa = window.sessionStorage.objetoBusca
       ? JSON.parse(window.sessionStorage.objetoBusca)
       : {};
+
     let params = new URLSearchParams(this.props.location.search);
+
     if (parseInt(params.get('visao'), 10)) {
       empresa = this.handleParams(params);
     }
 
-    if (JSON.stringify(empresa) !== '{}') {
-      this.getEventos(empresa);
+    if (JSON.stringify(empresa) != '{}') {
+      this.myCallbackBusca(empresa);
     }
-    this.userLanguege();
+    this.userLanguage();
   }
 
   handleParams(params) {
     this.handleChangeSelect(1);
+
     let empresaParams = {
       nome: params.get('nome'),
       mci: parseInt(params.get('mci'), 10),
@@ -117,7 +121,7 @@ class Header extends React.Component {
   }
 
   myCallbackBusca = empresaChild => {
-    salvarUltimaPesaquisaCache(1, empresaChild);
+    salvarUltimaPesquisaCache(1, empresaChild);
     this.setState({ empresa: empresaChild });
     if (empresaChild !== {}) {
       this.getEventos(empresaChild);
@@ -160,9 +164,7 @@ class Header extends React.Component {
               }
             })
           : [];
-
-        this.setState({ eventos: eventosFiltrado });
-
+        this.setEventos(eventosFiltrado);
         this.setDados(data.dados[0]);
       })
 
@@ -235,7 +237,7 @@ class Header extends React.Component {
   }
 }
 
-function salvarUltimaPesaquisaCache(visao, objeto) {
+function salvarUltimaPesquisaCache(visao, objeto) {
   window.sessionStorage.visao = visao;
   window.sessionStorage.objetoBusca = JSON.stringify(objeto);
 }
