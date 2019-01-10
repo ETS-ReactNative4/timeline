@@ -86,12 +86,7 @@ class App extends Component {
                 token={this.state.token}
               />
             ) : (
-              <Redirect
-                to={{
-                  pathname:
-                    'https://login.intranet.bb.com.br/distAuth/UI/Login?goto=https://uce.intranet.bb.com.br/timeline/'
-                }}
-              />
+              ''
             )
           }
         />
