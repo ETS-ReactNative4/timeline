@@ -54,35 +54,33 @@ class Header extends React.Component {
     this.setState({ language: language });
   }
 
-  componentWillMount() {
+  componentDidMount() {
     this.setState({ visao: window.sessionStorage.visao || 1 });
 
     let empresa = window.sessionStorage.objetoBusca
       ? JSON.parse(window.sessionStorage.objetoBusca)
       : {};
 
-    let params = new URLSearchParams(this.props.location.search);
+    empresa = this.handleParams();
 
-    if (parseInt(params.get('visao'), 10)) {
-      empresa = this.handleParams(params);
-    }
+    /* if (JSON.stringify(empresa) != '{}') */ this.myCallbackBusca(empresa);
 
-    if (JSON.stringify(empresa) != '{}') {
-      this.myCallbackBusca(empresa);
-    }
+    console.log(empresa);
     this.userLanguage();
   }
 
-  handleParams(params) {
+  handleParams() {
+    let params = new URLSearchParams(this.props.location.search);
+
     this.handleChangeSelect(1);
 
     let empresaParams = {
-      nome: params.get('nome'),
-      mci: parseInt(params.get('mci'), 10),
-      cod_pais: parseInt(params.get('cod_pais'), 10),
-      pais: params.get('pais'),
-      tabela_origem: parseInt(params.get('tabela_origem')),
-      bloco_origem: parseInt(params.get('bloco_origem'))
+      nome: params.get('nome') || '',
+      mci: parseInt(params.get('mci'), 10) || 0,
+      cod_pais: parseInt(params.get('cod_pais'), 10) || 0,
+      pais: params.get('pais') || '',
+      tabela_origem: parseInt(params.get('tabela_origem')) || 2,
+      bloco_origem: parseInt(params.get('bloco_origem')) || 3
     };
 
     return empresaParams;
@@ -142,6 +140,7 @@ class Header extends React.Component {
   };
 
   getEventos = empresa => {
+    const { token } = this.props;
     fetch(this.state.urlEventos, {
       method: 'POST',
       body: JSON.stringify({
@@ -150,7 +149,7 @@ class Header extends React.Component {
         excluidos: true
       }),
       headers: {
-        'x-access-token': window.sessionStorage.token,
+        'x-access-token': token || window.sessionStorage.token,
         Accept: 'application/json, text/plain, */*',
         'Content-Type': 'application/json'
       }

@@ -25,7 +25,8 @@ class App extends Component {
 
     this.state = {
       user: {},
-      autenticado: false
+      autenticado: false,
+      token: ''
     };
   }
   autentica = () => {
@@ -42,24 +43,30 @@ class App extends Component {
       }
     )
       .then(response => {
-        if (response.status > 300) {
+        if (response.status > 350) {
+          this.setState({ autenticado: false });
           window.location =
             'https://login.intranet.bb.com.br/distAuth/UI/Login?goto=https://uce.intranet.bb.com.br/timeline/';
-          this.setState({ autenticado: false });
         }
 
         if (response.headers.get('x-access-token') != null) {
           window.sessionStorage.token = response.headers.get('x-access-token');
+          this.setState({ token: response.headers.get('x-access-token') });
         }
 
         return response.json();
       })
       .then(response => {
         this.setState({ user: response.user[0] });
+
+        this.setState({ autenticado: true });
       })
-      .then(this.setState({ autenticado: true }))
 
       .catch(function(err) {
+        this.setState({ token: '' });
+        this.setState({ autenticado: false });
+        window.location =
+          'https://login.intranet.bb.com.br/distAuth/UI/Login?goto=https://uce.intranet.bb.com.br/timeline/';
         console.error(err);
       });
   };
@@ -73,7 +80,11 @@ class App extends Component {
         <Route
           render={props =>
             this.state.autenticado ? (
-              <Header {...props} user={this.state.user} />
+              <Header
+                {...props}
+                user={this.state.user}
+                token={this.state.token}
+              />
             ) : (
               <Redirect
                 to={{
