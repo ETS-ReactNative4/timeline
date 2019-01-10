@@ -77,17 +77,6 @@ function createEmpresa(
   envolvimento,
   user
 ) {
-  console.log(
-    nome,
-    mci,
-    cod_pais,
-    pais,
-    tabela_origem,
-    bloco_origem,
-    envolvimento,
-    user
-  );
-
   counterEmp += 1;
   return {
     id: counterEmp,
@@ -205,8 +194,6 @@ class FormEvent extends React.Component {
 
     empresa.envolvimento = 'Target';
 
-    console.log(user);
-
     this.setDependencia({
       nome: user.nome_reduzido,
       uor: user.uor,
@@ -300,12 +287,10 @@ class FormEvent extends React.Component {
     event.preventDefault();
     if (this.handleValidationForm()) {
       let { evento } = this.state;
-      console.log(evento);
 
       const { empresa } = this.props;
 
       const method = evento.id ? 'PUT' : 'POST';
-      console.log(method);
 
       fetch(`https://uce.intranet.bb.com.br/api-timeline/v1/eventos`, {
         method: method,

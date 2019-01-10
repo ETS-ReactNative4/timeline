@@ -65,7 +65,6 @@ class Header extends React.Component {
 
     /* if (JSON.stringify(empresa) != '{}') */ this.myCallbackBusca(empresa);
 
-    console.log(empresa);
     this.userLanguage();
   }
 

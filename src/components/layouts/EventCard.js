@@ -83,6 +83,11 @@ const styles = theme => ({
     backgroundColor: '#009688'
   },
 
+  tipoEventoColor9: {
+    margin: '10px 10px 0px 10px',
+    padding: 3,
+    backgroundColor: '#00BCD4'
+  },
   sessaoTitulo: { marginTop: 24 },
   tipoEventoTitle: {
     color: 'white',
@@ -262,6 +267,16 @@ class EventCard extends React.Component {
       case 8:
         return (
           <div className={classes.tipoEventoColor8}>
+            <Typography variant="caption" className={classes.tipoEventoTitle}>
+              {evento.tipo_envolvimento_descricao}
+            </Typography>
+          </div>
+        );
+        break;
+
+      case 9:
+        return (
+          <div className={classes.tipoEventoColor9}>
             <Typography variant="caption" className={classes.tipoEventoTitle}>
               {evento.tipo_envolvimento_descricao}
             </Typography>
