@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import Header from './components/layouts/Header';
-import { BrowserRouter as Router, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter as Router, Route } from 'react-router-dom';
 
 function getCookie(cname) {
   var name = cname + '=';

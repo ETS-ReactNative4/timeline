@@ -164,6 +164,8 @@ class Header extends React.Component {
           : [];
         this.setEventos(eventosFiltrado);
         this.setDados(data.dados[0]);
+
+        return;
       })
 
       .catch(function(err) {

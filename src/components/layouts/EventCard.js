@@ -23,7 +23,7 @@ import {
   Button
 } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
-import { green, blue, amber, purple } from '@material-ui/core/colors';
+import { green, blue, amber } from '@material-ui/core/colors';
 import 'moment/locale/pt-br';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 
@@ -54,40 +54,23 @@ const styles = theme => ({
   tipoEvento: {
     display: 'flex'
   },
-  tipoEventoColor1: {
+  tipoEventoNome: {
     margin: '10px 10px 0px 10px',
-    padding: 3,
-    backgroundColor: amber[700]
+    padding: 4
   },
+
   tipoEventoColor3: {
+    backgroundColor: amber[900],
     margin: '10px 10px 0px 10px',
-    padding: 3,
-    backgroundColor: amber[900]
+    padding: 4
   },
 
   tipoEventoColor4: {
+    backgroundColor: green[600],
     margin: '10px 10px 0px 10px',
-    padding: 3,
-    backgroundColor: green[600]
+    padding: 4
   },
 
-  tipoEventoColor2: {
-    margin: '10px 10px 0px 10px',
-    padding: 3,
-    backgroundColor: purple[800]
-  },
-
-  tipoEventoColor8: {
-    margin: '10px 10px 0px 10px',
-    padding: 3,
-    backgroundColor: '#009688'
-  },
-
-  tipoEventoColor9: {
-    margin: '10px 10px 0px 10px',
-    padding: 3,
-    backgroundColor: '#00BCD4'
-  },
   sessaoTitulo: { marginTop: 24 },
   tipoEventoTitle: {
     color: 'white',
@@ -126,9 +109,6 @@ class EventCard extends React.Component {
       comentarios: [],
       errors: {}
     };
-    this.tipoEvento = this.tipoEvento.bind();
-    this.excluir = this.excluir.bind();
-    this.handleExpandClick = this.handleExpandClick.bind();
   }
 
   componentDidMount() {
@@ -242,52 +222,6 @@ class EventCard extends React.Component {
 
     e.preventDefault();
   };
-  tipoEvento(evento, classes) {
-    switch (evento.tipo_evento_id) {
-      case 1:
-        return (
-          <div className={classes.tipoEventoColor1}>
-            <Typography variant="caption" className={classes.tipoEventoTitle}>
-              {evento.tipo_envolvimento_descricao}
-            </Typography>
-          </div>
-        );
-        break;
-
-      case 3:
-        return (
-          <div className={classes.tipoEventoColor2}>
-            <Typography variant="caption" className={classes.tipoEventoTitle}>
-              {evento.tipo_envolvimento_descricao}
-            </Typography>
-          </div>
-        );
-        break;
-
-      case 8:
-        return (
-          <div className={classes.tipoEventoColor8}>
-            <Typography variant="caption" className={classes.tipoEventoTitle}>
-              {evento.tipo_envolvimento_descricao}
-            </Typography>
-          </div>
-        );
-        break;
-
-      case 9:
-        return (
-          <div className={classes.tipoEventoColor9}>
-            <Typography variant="caption" className={classes.tipoEventoTitle}>
-              {evento.tipo_envolvimento_descricao}
-            </Typography>
-          </div>
-        );
-        break;
-
-      default:
-        break;
-    }
-  }
 
   handleChange = input => e => {
     this.setState({ [input]: e.target.value });
@@ -303,26 +237,32 @@ class EventCard extends React.Component {
         <Grid item className={classes.card}>
           <Paper>
             <div className={classes.tipoEvento}>
-              {this.tipoEvento(evento, classes)}
-              {evento.status === 1 ? (
-                <div className={classes.tipoEventoColor3}>
-                  <Typography
-                    variant="caption"
-                    className={classes.tipoEventoTitle}
-                  >
-                    {evento.status_descricao}
-                  </Typography>
-                </div>
-              ) : (
-                <div className={classes.tipoEventoColor4}>
-                  <Typography
-                    variant="caption"
-                    className={classes.tipoEventoTitle}
-                  >
-                    {evento.status_descricao}
-                  </Typography>
-                </div>
-              )}
+              <div
+                className={classes.tipoEventoNome}
+                style={{ backgroundColor: evento.tipo_evento_color }}
+              >
+                <Typography
+                  variant="caption"
+                  className={classes.tipoEventoTitle}
+                >
+                  {evento.tipo_evento_descricao}
+                </Typography>
+              </div>
+
+              <div
+                className={
+                  evento.status === 1
+                    ? classes.tipoEventoColor3
+                    : classes.tipoEventoColor4
+                }
+              >
+                <Typography
+                  variant="caption"
+                  className={classes.tipoEventoTitle}
+                >
+                  {evento.status_descricao}
+                </Typography>
+              </div>
             </div>
 
             <CardHeader
