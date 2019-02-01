@@ -12,6 +12,8 @@ import AddIcon from '@material-ui/icons/Add';
 import { Fab } from '@material-ui/core';
 import icon360 from '../../assets/images/360icon.png';
 import ProfileEmpresa from './ProfileEmpresa';
+import TableVinculosBrasil from './TableVinculosBrasil';
+
 import { getEmpresa } from '../../actions/empresaActions';
 
 import { connect } from 'react-redux';
@@ -152,6 +154,9 @@ class CardGrid extends React.Component {
               </div>
 
               <ProfileEmpresa empresa={empresa} />
+              {empresa.empresas ? (
+                <TableVinculosBrasil empresas={JSON.parse(empresa.empresas)} />
+              ) : null}
             </Grid>
           </Grid>
           <Grid container spacing={8}>

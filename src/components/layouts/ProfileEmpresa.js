@@ -1,7 +1,6 @@
 import React from 'react';
 import { Typography, Avatar, Paper } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
-import moment from 'moment';
 
 const styles = {
   cardProfileCarteira: {
@@ -11,7 +10,7 @@ const styles = {
   cardHeader: { background: '#1565c02e' },
   cardContent: {
     padding: 16,
-    paddingTop: 24,
+    paddingTop: 16,
     display: 'flex',
     justifyContent: 'space-evenly',
     flexDirection: 'column'
