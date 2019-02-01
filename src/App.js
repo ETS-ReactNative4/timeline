@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import Header from './components/layouts/Header';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-
+import { Provider } from 'react-redux';
+import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import store from './store';
+import 'typeface-roboto';
 function getCookie(cname) {
   var name = cname + '=';
   var decodedCookie = decodeURIComponent(document.cookie);
@@ -76,23 +79,38 @@ class App extends Component {
   }
   render() {
     return (
-      <Router initialEntries={['/timeline']} initialIndex={0}>
-        <Route
-          render={props =>
-            this.state.autenticado ? (
-              <Header
-                {...props}
-                user={this.state.user}
-                token={this.state.token}
-              />
-            ) : (
-              ''
-            )
-          }
-        />
-      </Router>
+      <Provider store={store}>
+        <Router initialEntries={['/timeline']} initialIndex={0}>
+          <MuiThemeProvider theme={theme}>
+            <Route
+              render={props =>
+                this.state.autenticado ? (
+                  <Header
+                    {...props}
+                    user={this.state.user}
+                    token={this.state.token}
+                  />
+                ) : (
+                  ''
+                )
+              }
+            />
+          </MuiThemeProvider>
+        </Router>
+      </Provider>
     );
   }
 }
 
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#1565c0',
+      dark: '#0d47a1'
+    },
+    secondary: {
+      main: '#FEDA19'
+    }
+  }
+});
 export default App;

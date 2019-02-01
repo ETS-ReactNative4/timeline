@@ -10,6 +10,11 @@ import ToDo from './ToDo';
 import FormEvent from './FormEvent';
 import AddIcon from '@material-ui/icons/Add';
 import { Fab } from '@material-ui/core';
+import icon360 from '../../assets/images/360icon.png';
+import ProfileEmpresa from './ProfileEmpresa';
+import { getEmpresa } from '../../actions/empresaActions';
+
+import { connect } from 'react-redux';
 const styles = theme => ({
   root: {
     flexGrow: 1,
@@ -130,10 +135,23 @@ class CardGrid extends React.Component {
           )}
           <Grid container spacing={8}>
             <Grid item xs={12} md={12} lg={12} className={classes.root}>
-              <Typography variant="h4">{empresa.nome}</Typography>
-              <Typography variant="subtitle1" color="textSecondary">
-                {empresa.pais}
-              </Typography>
+              <div style={{ display: 'flex' }}>
+                <Typography variant="h4">{empresa.nome}</Typography>
+                <a
+                  target="_blank"
+                  href={`https://plataforma.atendimento.bb.com.br:49286/estatico/gaw/app/spas/index/index.app.html?cd_modo_uso=43&empresa=${
+                    empresa.mci
+                  }`}
+                >
+                  <img
+                    alt="icon360"
+                    src={icon360}
+                    style={{ height: '38px', paddingLeft: '30px' }}
+                  />
+                </a>
+              </div>
+
+              <ProfileEmpresa empresa={empresa} />
             </Grid>
           </Grid>
           <Grid container spacing={8}>
@@ -190,7 +208,15 @@ class CardGrid extends React.Component {
 }
 
 CardGrid.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  getEmpresa: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(CardGrid);
+const mapStateToProps = state => ({
+  empresa: state.empresa.empresa
+});
+
+export default connect(
+  mapStateToProps,
+  { getEmpresa }
+)(withStyles(styles)(CardGrid));

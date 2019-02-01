@@ -54,7 +54,7 @@ class Dashboard extends React.Component {
           <div className={classes.grupo}>
             <CardIcon bgColor="#43A047" Icon={DoneAll} />
             <Card className={classes.card}>
-              <Typography variant="h6" className={classes.cardCategory}>
+              <Typography className={classes.cardCategory}>
                 Concluded meetings {/*Visitas Concluídas */}
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>
@@ -69,9 +69,7 @@ class Dashboard extends React.Component {
             <CardIcon bgColor="#6a1b9a" Icon={Phone} />
 
             <Card className={classes.card}>
-              <Typography variant="h6" className={classes.cardCategory}>
-                Calls
-              </Typography>
+              <Typography className={classes.cardCategory}>Calls</Typography>
               <Typography variant="h4" className={classes.cardTitle}>
                 {dados.ligacoes}
               </Typography>
@@ -84,9 +82,7 @@ class Dashboard extends React.Component {
             <CardIcon bgColor="#009688" Icon={EmailOutlined} />
 
             <Card className={classes.card}>
-              <Typography variant="h6" className={classes.cardCategory}>
-                Emails
-              </Typography>
+              <Typography className={classes.cardCategory}>Emails</Typography>
               <Typography variant="h4" className={classes.cardTitle}>
                 {dados.ligacoes}
               </Typography>
@@ -99,9 +95,7 @@ class Dashboard extends React.Component {
             <CardIcon bgColor="#00BCD4" Icon={NotesSharp} />
 
             <Card className={classes.card}>
-              <Typography variant="h6" className={classes.cardCategory}>
-                Remarks
-              </Typography>
+              <Typography className={classes.cardCategory}>Remarks</Typography>
               <Typography variant="h4" className={classes.cardTitle}>
                 {dados.observacao}
               </Typography>
@@ -112,7 +106,7 @@ class Dashboard extends React.Component {
           <div className={classes.grupo}>
             <CardIcon bgColor="#0D47A1" Icon={Event} />
             <Card className={classes.card}>
-              <Typography variant="h6" className={classes.cardCategory}>
+              <Typography className={classes.cardCategory}>
                 Total of Events
               </Typography>
               <Typography variant="h4" className={classes.cardTitle}>

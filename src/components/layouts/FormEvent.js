@@ -504,6 +504,12 @@ class FormEvent extends React.Component {
     return formIsValid;
   }
 
+  onKeyPress = event => {
+    if (event.target.type != 'textarea' && event.which === 13 /* Enter */) {
+      event.preventDefault();
+    }
+  };
+
   render() {
     const locale = localeMap[this.state.currentLocale];
     const { classes, open } = this.props;
@@ -541,7 +547,7 @@ class FormEvent extends React.Component {
           </AppBar>
 
           <div className={classes.formDiv}>
-            <form onSubmit={this.enviaForm}>
+            <form onSubmit={this.enviaForm} onKeyPress={this.onKeyPress}>
               <div className={classes.formSection}>
                 <MuiPickersUtilsProvider
                   utils={MomentUtils}
@@ -639,7 +645,7 @@ class FormEvent extends React.Component {
                   InputLabelProps={{
                     shrink: true
                   }}
-                  placeholder="Enter why the unit is involved with the this Event etc"
+                  placeholder="Enter why the unit is involved with this Event etc"
                   id="standard-envolvimento"
                   label="Action"
                   fullWidth
@@ -691,7 +697,7 @@ class FormEvent extends React.Component {
                   InputLabelProps={{
                     shrink: true
                   }}
-                  placeholder="Enter why the participant is involved with the this Event etc"
+                  placeholder="Enter why the participant is involved with this Event etc"
                   id="standard-envolvimento"
                   label="Action"
                   fullWidth
@@ -743,7 +749,7 @@ class FormEvent extends React.Component {
                   InputLabelProps={{
                     shrink: true
                   }}
-                  placeholder="Enter why the company is involved with the this Event etc"
+                  placeholder="Enter why the company is involved with this Event etc"
                   id="standard-envolvimento"
                   label="Action"
                   fullWidth

@@ -10,23 +10,16 @@ import Busca from './busca/Busca';
 import FormControl from '@material-ui/core/FormControl';
 import logo from '../../bancodobrasil.png';
 import flag from '../../eng.png';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
 import CardGrid from './CardGrid';
 import { Avatar } from '@material-ui/core';
+/** redux empresa */
+
+import { getEmpresa } from '../../actions/empresaActions';
+
+import { connect } from 'react-redux';
 
 //https://uce.intranet.bb.com.br/timeline/?visao=1&bloco_origem=4&cnpj=05.721.752/0001-65&cod_pais=23&mci=509277368&nm_prefixo_redex=FRANKFURT%20ALEMANHA&nome=ADIDAS%20AG&pais=ALEMANHA&prefixo_redex=720&tabela_origem=2
-
-const theme = createMuiTheme({
-  palette: {
-    primary: {
-      main: '#1565c0',
-      dark: '#0d47a1'
-    },
-    secondary: {
-      main: '#FEDA19'
-    }
-  }
-});
 
 class Header extends React.Component {
   constructor(props) {
@@ -118,9 +111,11 @@ class Header extends React.Component {
   }
 
   myCallbackBusca = empresaChild => {
+    this.props.getEmpresa(empresaChild.cod_pais, empresaChild.nome);
+
     salvarUltimaPesquisaCache(1, empresaChild);
     this.setState({ empresa: empresaChild });
-    if (empresaChild !== {}) {
+    if (JSON.stringify(empresaChild) !== '{}') {
       this.getEventos(empresaChild);
     }
   };
@@ -176,62 +171,59 @@ class Header extends React.Component {
   render() {
     const { classes } = this.props;
     const { url, eventos, language } = this.state;
-    const { user } = this.props;
-    const { empresa, dados } = this.state;
+    const { user, empresa } = this.props;
+    const { dados } = this.state;
 
     return (
       <div className={classes.root}>
-        <MuiThemeProvider theme={theme}>
-          <AppBar position="static" color="primary">
-            <Toolbar>
-              <img style={{ margin: 8 }} src={logo} alt="BB" />
-              <Typography
-                variant="h6"
-                color="inherit"
-                noWrap
-                className={classes.topBar}
-              >
-                UCE Timeline
-              </Typography>
-              <img
-                style={{ margin: 8 }}
-                id="eng"
-                src={flag}
-                alt="Flag English"
-              />
-              <Avatar
-                alt={this.props.user.CD_USU}
-                src={
-                  'https://humanograma.intranet.bb.com.br/avatar/' +
-                  this.props.user.CD_USU
-                }
-              />
-            </Toolbar>
-            <Toolbar className={classes.subBar}>
-              <FormControl fullWidth>
-                <Busca url={url} addSuggestion={this.myCallbackBusca} />
-              </FormControl>
-            </Toolbar>
-          </AppBar>
+        <AppBar position="static" color="primary">
+          <Toolbar>
+            <img style={{ margin: 8 }} src={logo} alt="BB" />
+            <Typography
+              variant="h6"
+              color="inherit"
+              noWrap
+              className={classes.topBar}
+            >
+              UCE Timeline
+            </Typography>
+            <img
+              style={{ margin: 8 }}
+              id="engl"
+              src={flag}
+              alt="Flag English"
+            />
+            <Avatar
+              alt={this.props.user.CD_USU}
+              src={
+                'https://humanograma.intranet.bb.com.br/avatar/' +
+                this.props.user.CD_USU
+              }
+            />
+          </Toolbar>
+          <Toolbar className={classes.subBar}>
+            <FormControl fullWidth>
+              <Busca url={url} addSuggestion={this.myCallbackBusca} />
+            </FormControl>
+          </Toolbar>
+        </AppBar>
 
-          <Route
-            path="/timeline"
-            render={props => (
-              <CardGrid
-                language={language}
-                empresa={empresa}
-                eventos={eventos}
-                dados={dados}
-                getEventos={this.getEventos}
-                setEventos={this.setEventos}
-                setEvento={this.setEvento}
-                setDados={this.setDados}
-                user={user}
-                {...props}
-              />
-            )}
-          />
-        </MuiThemeProvider>
+        <Route
+          path="/timeline"
+          render={props => (
+            <CardGrid
+              language={language}
+              eventos={eventos}
+              dados={dados}
+              getEventos={this.getEventos}
+              setEventos={this.setEventos}
+              setEvento={this.setEvento}
+              setDados={this.setDados}
+              user={user}
+              {...props}
+            />
+          )}
+        />
       </div>
     );
   }
@@ -253,6 +245,14 @@ const styles = theme => ({
 });
 
 Header.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
+  getEmpresa: PropTypes.object.isRequired
 };
-export default withStyles(styles)(Header);
+
+const mapStateToProps = state => ({
+  empresa: state.empresa.empresa
+});
+export default connect(
+  mapStateToProps,
+  { getEmpresa }
+)(withStyles(styles)(Header));
