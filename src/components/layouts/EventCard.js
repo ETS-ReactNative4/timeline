@@ -167,11 +167,7 @@ class EventCard extends React.Component {
 
       .then(data => {
         const eventosFiltrado = data.timeline
-          ? data.timeline.filter(el => {
-              if (!el.dt_delete) {
-                return el;
-              }
-            })
+          ? data.timeline.filter(el => !el.dt_delete)
           : [];
         this.props.setEventos(eventosFiltrado);
         this.props.setDados(data.dados[0]);
@@ -311,11 +307,11 @@ class EventCard extends React.Component {
               <Divider />
               <div className={classes.flex}>
                 {evento.funcionarios
-                  ? evento.funcionarios.map(funci => {
+                  ? evento.funcionarios.map((funci, index) => {
                       return (
                         <Avatar
                           alt={funci.nome}
-                          key={funci.chave}
+                          key={index}
                           className={classes.smallAvatar}
                           src={`https://humanograma.intranet.bb.com.br/avatar/${
                             funci.chave
@@ -458,11 +454,7 @@ class EventCard extends React.Component {
       .then(response => response.json())
       .then(data => {
         const eventosFiltrado = data.timeline
-          ? data.timeline.filter(el => {
-              if (!el.dt_delete) {
-                return el;
-              }
-            })
+          ? data.timeline.filter(el => !el.dt_delete)
           : [];
         this.props.setEventos(eventosFiltrado);
         this.props.setDados(data.dados[0]);

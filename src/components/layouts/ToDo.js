@@ -110,7 +110,9 @@ class ToDo extends React.Component {
           nome: user.NM_FUN,
           chave: user.CD_USU,
           tipo_envolvimento_id: 1,
-          prefixo: user.CD_PRF_DEPE_ATU
+          prefixo: user.CD_PRF_DEPE_ATU,
+          envolvimento: 'Task Owner',
+          user: user.CD_USU
         }
       ],
       dependencias: [
@@ -118,7 +120,9 @@ class ToDo extends React.Component {
           nome: user.NM_PSC_RDZ,
           uor: user.CD_UOR_PSC,
           tipo_envolvimento_id: 1,
-          prefixo: user.CD_PRF_DEPE_ATU
+          prefixo: user.prefixo,
+          envolvimento: 'Task Unit',
+          user: user.CD_USU
         }
       ],
       empresas: [empresa]

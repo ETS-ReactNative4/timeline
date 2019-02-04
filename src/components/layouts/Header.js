@@ -151,11 +151,7 @@ class Header extends React.Component {
       .then(response => response.json())
       .then(data => {
         const eventosFiltrado = data.timeline
-          ? data.timeline.filter(el => {
-              if (!el.dt_delete) {
-                return el;
-              }
-            })
+          ? data.timeline.filter(el => !el.dt_delete)
           : [];
         this.setEventos(eventosFiltrado);
         this.setDados(data.dados[0]);
@@ -171,7 +167,7 @@ class Header extends React.Component {
   render() {
     const { classes } = this.props;
     const { url, eventos, language } = this.state;
-    const { user, empresa } = this.props;
+    const { user } = this.props;
     const { dados } = this.state;
 
     return (
@@ -246,7 +242,8 @@ const styles = theme => ({
 
 Header.propTypes = {
   classes: PropTypes.object.isRequired,
-  getEmpresa: PropTypes.object.isRequired
+  getEmpresa: PropTypes.func.isRequired,
+  empresa: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

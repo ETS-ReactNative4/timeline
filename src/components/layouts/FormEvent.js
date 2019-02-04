@@ -206,6 +206,24 @@ class FormEvent extends React.Component {
 
     this.setEmpresas(empresa);
 
+    console.log(JSON.parse(empresa.empresas));
+
+    const empresasVinc = JSON.parse(empresa.empresas);
+    empresasVinc.map(emp =>
+      this.setEmpresas(
+        createEmpresa(
+          emp.nm_cliente_brasil,
+          emp.mci,
+          emp.cod_pais,
+          'BRASIL',
+          1,
+          3,
+          emp.nm_vinculo_visao_ext,
+          emp.matricula_genin
+        )
+      )
+    );
+
     return evento;
   };
   handleChange = input => e => {
@@ -308,11 +326,7 @@ class FormEvent extends React.Component {
         .then(response => response.json())
         .then(data => {
           const eventosFiltrado = data.timeline
-            ? data.timeline.filter(el => {
-                if (!el.dt_delete) {
-                  return el;
-                }
-              })
+            ? data.timeline.filter(el => !el.dt_delete)
             : [];
           this.props.setEventos(eventosFiltrado);
           this.props.setDados(data.dados[0]);
@@ -505,7 +519,7 @@ class FormEvent extends React.Component {
   }
 
   onKeyPress = event => {
-    if (event.target.type != 'textarea' && event.which === 13 /* Enter */) {
+    if (event.target.type !== 'textarea' && event.which === 13 /* Enter */) {
       event.preventDefault();
     }
   };

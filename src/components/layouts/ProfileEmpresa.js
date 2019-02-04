@@ -9,7 +9,6 @@ const styles = {
   },
   cardHeader: { background: '#1565c02e' },
   cardContent: {
-    padding: 16,
     paddingTop: 16,
     display: 'flex',
     justifyContent: 'space-evenly',
@@ -25,8 +24,8 @@ const styles = {
     justifyContent: 'space-evenly',
     flexDirection: 'column',
     flexGrow: 1,
-    paddingRight: 12,
-    paddingLeft: 12,
+    paddingRight: 8,
+    paddingLeft: 8,
     marginBottom: 24
   },
   cardLabel: {
@@ -100,7 +99,9 @@ const ProfileEmpresa = props => {
           <ProfileItem
             classes={classes}
             title={'Prefixo Responsável'}
-            information={empresa.cnpj}
+            information={`${empresa.prefixo_redex} - ${
+              empresa.nm_prefixo_redex
+            }`}
           />
 
           <ProfileItem

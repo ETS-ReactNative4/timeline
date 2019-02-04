@@ -64,7 +64,7 @@ class CardGrid extends React.Component {
   };
 
   myCallbackOpenDialog = (open, target, evento) => {
-    if (target == 'newEvento') {
+    if (target === 'newEvento') {
       this.state({
         eventoEdit: this.createEvento()
       });
@@ -140,6 +140,7 @@ class CardGrid extends React.Component {
               <div style={{ display: 'flex' }}>
                 <Typography variant="h4">{empresa.nome}</Typography>
                 <a
+                  rel="noopener noreferrer"
                   target="_blank"
                   href={`https://plataforma.atendimento.bb.com.br:49286/estatico/gaw/app/spas/index/index.app.html?cd_modo_uso=43&empresa=${
                     empresa.mci
@@ -214,7 +215,8 @@ class CardGrid extends React.Component {
 
 CardGrid.propTypes = {
   classes: PropTypes.object.isRequired,
-  getEmpresa: PropTypes.object.isRequired
+  getEmpresa: PropTypes.func.isRequired,
+  empresa: PropTypes.object.isRequired
 };
 
 const mapStateToProps = state => ({

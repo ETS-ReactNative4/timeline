@@ -5,60 +5,95 @@ import {
   TableHead,
   TableRow,
   TableCell,
-  TableBody
+  TableBody,
+  Typography
 } from '@material-ui/core';
 import { withStyles } from '@material-ui/core/styles';
 
 const styles = {
-  table: { marginTop: 16 }
+  table: { marginTop: 8 },
+  cardCategory: {
+    margin: 0,
+    fontSize: '18px',
+    paddingLeft: 16,
+    paddingTop: 16,
+    paddingBottom: 0
+  },
+  tableWrapper: {
+    overflowX: 'auto'
+  }
 };
 
 const TableVinculosBrasil = props => {
   const { empresas, classes } = props;
-  console.log(empresas);
 
   return (
     <Paper className={classes.table}>
-      <Table className={classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Vínculo</TableCell>
-            <TableCell align="right">Informações</TableCell>
-            <TableCell align="right">CNPJ</TableCell>
-            <TableCell align="right">Empresa</TableCell>
-            <TableCell align="right">Prefixo</TableCell>
-            <TableCell align="right">Diretoria</TableCell>
-
-            <TableCell align="right">Pref. Gecex</TableCell>
-            <TableCell align="right">Gecex</TableCell>
-            <TableCell align="right">Responsável</TableCell>
-            <TableCell align="right">Visitado Últimos 180 Dias</TableCell>
-            <TableCell align="right">Visita Agendada</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {empresas.map((row, index) => (
-            <TableRow key={row.index}>
-              <TableCell component="th" scope="row">
-                {row.nm_vinculo_visao_ext}
+      <Typography className={classes.cardCategory}>Vínculos Brasil</Typography>
+      <div className={classes.tableWrapper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell padding="none" align="center">
+                Vínculo
               </TableCell>
-              <TableCell component="th" scope="row">
-                {row.info_vinculo}
+              <TableCell padding="none" align="center">
+                Informações
               </TableCell>
-              <TableCell align="right">{row.cnpj}</TableCell>
-              <TableCell align="right">{row.nm_cliente}</TableCell>
-              <TableCell align="right">{row.prefixo_cliente}</TableCell>
-              <TableCell align="right">{row.nm_diretoria_cliente}</TableCell>
+              <TableCell padding="none" align="center">
+                CNPJ
+              </TableCell>
+              <TableCell padding="none" align="center">
+                Empresa
+              </TableCell>
+              <TableCell padding="none" align="center">
+                Prefixo Cliente
+              </TableCell>
+              <TableCell padding="none" align="center">
+                Super
+              </TableCell>
 
-              <TableCell align="right">{row.prefixo_gecex}</TableCell>
-              <TableCell align="right">{row.nm_gecex}</TableCell>
-              <TableCell align="right">{row.nm_genin}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
-              <TableCell align="right">{row.protein}</TableCell>
+              <TableCell padding="none" align="center">
+                Gecex
+              </TableCell>
+              <TableCell padding="none" align="center">
+                Genin
+              </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {empresas.map((row, index) => (
+              <TableRow key={index}>
+                <TableCell padding="none" align="center">
+                  {row.nm_vinculo_visao_ext}
+                </TableCell>
+                <TableCell padding="none" align="center">
+                  {row.info_vinculo}
+                </TableCell>
+                <TableCell padding="none" align="center">
+                  {row.cnpj}
+                </TableCell>
+                <TableCell padding="none" align="center">
+                  {row.nm_cliente_brasil}
+                </TableCell>
+                <TableCell padding="none" align="center">
+                  {row.prefixo_cliente}
+                </TableCell>
+                <TableCell padding="none" align="center">
+                  {row.nm_super_cliente}
+                </TableCell>
+
+                <TableCell padding="none" align="center">
+                  {row.nm_gecex}
+                </TableCell>
+                <TableCell padding="none" align="center">
+                  {row.nm_genin}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </Paper>
   );
 };
